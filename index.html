@@ -228,6 +228,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.5}
         <div><label>LUMS email *</label><input type="email" id="app-email" placeholder="xyz@lums.edu.pk"></div>
       </div>
       <div class="row2">
+        <div><label>Phone number *</label><input type="tel" id="app-phone" placeholder="e.g. 0300-1234567"></div>
         <div>
           <label>Your role *</label>
           <select id="app-role">
@@ -236,7 +237,10 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.5}
             <option value="undergrad">Undergraduate student</option>
           </select>
         </div>
-        <div><label>Department / Program</label><input type="text" id="app-dept" placeholder="e.g. BSc Mathematics, Year 2"></div>
+      </div>
+      <div class="row2">
+        <div><label>Major</label><input type="text" id="app-dept" placeholder="e.g. Mathematics, Computer Science"></div>
+        <div></div>
       </div>
       <div class="card-header" style="margin-top:1.25rem">Session preference</div>
       <label>Preferred session slot *</label>
@@ -411,16 +415,17 @@ function renderApplySlots(){
 async function submitApplication(){
   const name=document.getElementById('app-name').value.trim();
   const email=document.getElementById('app-email').value.trim();
+  const phone=document.getElementById('app-phone').value.trim();
   const role=document.getElementById('app-role').value;
   const slot=document.getElementById('app-slot').value;
   ['apply-success','apply-err','apply-dberr'].forEach(id=>document.getElementById(id).style.display='none');
-  if(!name||!email||!role||!slot){document.getElementById('apply-err').style.display='block';return;}
+  if(!name||!email||!phone||!role||!slot){document.getElementById('apply-err').style.display='block';return;}
   document.getElementById('apply-spinner').style.display='inline';
   try{
-    const row={id:'a'+Date.now(),name,email,role,dept:document.getElementById('app-dept').value,slot,topic:document.getElementById('app-topic').value,note:document.getElementById('app-note').value,status:'pending'};
+    const row={id:'a'+Date.now(),name,email,phone,role,dept:document.getElementById('app-dept').value,slot,topic:document.getElementById('app-topic').value,note:document.getElementById('app-note').value,status:'pending'};
     await sbInsert('applications',row);state.applications.push(row);
     document.getElementById('apply-success').style.display='block';
-    ['app-name','app-email','app-dept','app-topic','app-note'].forEach(f=>document.getElementById(f).value='');
+    ['app-name','app-email','app-phone','app-dept','app-topic','app-note'].forEach(f=>document.getElementById(f).value='');
     document.getElementById('app-role').value='';document.getElementById('app-slot').value='';
     setTimeout(()=>document.getElementById('apply-success').style.display='none',5000);
   }catch(e){document.getElementById('apply-dberr').style.display='block';}
@@ -515,7 +520,7 @@ function renderAppsList(){
     return`<div class="app-row">
       <div class="ainfo">
         <div class="aname">${a.name}</div>
-        <div class="ameta">${a.email} &bull; ${a.dept||'No dept given'}</div>
+        <div class="ameta">${a.email} &bull; ${a.phone||'No phone'} &bull; ${a.dept||'No major given'}</div>
         <div class="ameta">Slot: ${slot?fmt(slot.date)+' '+fmtTime(slot.time):'Unknown'}</div>
         ${a.topic?`<div class="ameta">Topic: ${a.topic}</div>`:''}
         ${a.note?`<div class="ameta">Note: ${a.note}</div>`:''}
@@ -617,10 +622,10 @@ function exportExcel(type){
       })];
   }else{
     filename='lums_math_circle_applications.csv';
-    rows=[['ID','Name','Email','Role','Department','Slot Date','Topic','Note','Status'],
+    rows=[['ID','Name','Email','Phone','Role','Major','Slot Date','Topic','Note','Status'],
       ...state.applications.map(a=>{
         const slot=getSlot(a.slot);
-        return[a.id,a.name,a.email,a.role,a.dept||'',slot?slot.date:'',a.topic||'',a.note||'',a.status];
+        return[a.id,a.name,a.email,a.phone||'',a.role,a.dept||'',slot?slot.date:'',a.topic||'',a.note||'',a.status];
       })];
   }
   const csv=rows.map(r=>r.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
