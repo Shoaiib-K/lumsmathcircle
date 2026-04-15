@@ -88,6 +88,9 @@ input:hover,select:hover{border-color:var(--border3)}
 .btn-danger:hover{background:#fecaca}
 .btn-export{background:var(--success-bg);color:var(--success-text);border-color:#86efac}
 .btn-export:hover{background:#bbf7d0}
+.modal-open{overflow:hidden}
+.badge-rejected{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+.badge-paired{background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe}
 
 /* SLOT ROWS */
 .slot-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);flex-wrap:wrap}
@@ -343,12 +346,50 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.5}
 
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;flex-wrap:wrap;gap:10px">
         <div class="section-title" style="margin-bottom:0">Applications</div>
-        <select id="filter-slot" style="width:auto;font-size:12px;padding:6px 10px" onchange="renderAppsList()">
-          <option value="">All slots</option>
-        </select>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <select id="filter-slot" style="width:auto;font-size:12px;padding:6px 10px" onchange="renderAppsList()">
+            <option value="">All slots</option>
+          </select>
+          <button class="btn btn-sm" id="toggle-rejected-btn" onclick="toggleRejected()" style="background:var(--danger-bg);color:var(--danger-text);border-color:#fca5a5">Show Rejected</button>
+        </div>
       </div>
       <div class="card"><div id="applications-list"></div></div>
+
+      <div id="rejected-section" style="display:none">
+        <div class="section-title" style="color:var(--danger-text);margin-top:1rem">Rejected Applications</div>
+        <div class="card"><div id="rejected-list"></div></div>
+      </div>
     </div>
+  </div>
+</div>
+
+<!-- EDIT APPLICATION MODAL -->
+<div id="edit-modal-backdrop" style="display:none;position:fixed;inset:0;background:rgba(10,31,92,0.45);z-index:999;display:none;align-items:center;justify-content:center;padding:1rem">
+  <div style="background:#fff;border-radius:var(--radius-xl);padding:2rem;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(10,31,92,0.2);position:relative">
+    <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:1.25rem">Edit Application</div>
+    <input type="hidden" id="edit-app-id">
+    <div class="row2">
+      <div><label>Full name</label><input type="text" id="edit-name"></div>
+      <div><label>Email</label><input type="email" id="edit-email"></div>
+    </div>
+    <div class="row2">
+      <div><label>Phone</label><input type="tel" id="edit-phone"></div>
+      <div><label>Role</label>
+        <select id="edit-role">
+          <option value="grad">Graduate</option>
+          <option value="undergrad">Undergraduate</option>
+        </select>
+      </div>
+    </div>
+    <div><label>Major</label><input type="text" id="edit-dept"></div>
+    <div><label>Topic</label><input type="text" id="edit-topic"></div>
+    <div><label>Note</label><textarea id="edit-note" rows="2"></textarea></div>
+    <div style="display:flex;gap:10px;margin-top:1.25rem">
+      <button class="btn btn-primary" onclick="saveEditApplication()">Save Changes</button>
+      <button class="btn" onclick="closeEditModal()">Cancel</button>
+    </div>
+    <div id="edit-success" class="alert alert-success">Changes saved.</div>
+    <div id="edit-err" class="alert alert-danger">Failed to save. Try again.</div>
   </div>
 </div>
 
@@ -440,7 +481,7 @@ async function submitApplication(){
   if(!name||!email||!phone||!role||!slot){document.getElementById('apply-err').style.display='block';return;}
   document.getElementById('apply-spinner').style.display='inline';
   try{
-    const row={id:'a'+Date.now(),name,email,phone,role,dept:document.getElementById('app-dept').value,slot,topic:document.getElementById('app-topic').value,note:document.getElementById('app-note').value,status:'pending'};
+    const row={id:'a'+Date.now(),name,email,phone,role,dept:document.getElementById('app-dept').value,slot,topic:document.getElementById('app-topic').value,note:document.getElementById('app-note').value,status:'pending',submitted_at:new Date().toISOString()};
     await sbInsert('applications',row);state.applications.push(row);
     document.getElementById('apply-success').style.display='block';
     ['app-name','app-email','app-phone','app-dept','app-topic','app-note'].forEach(f=>document.getElementById(f).value='');
@@ -527,33 +568,62 @@ function renderFilterSlots(){
 
 function renderAppsList(){
   const filterSlot=document.getElementById('filter-slot')?.value||'';
-  let apps=[...state.applications];
+  let apps=state.applications.filter(a=>a.status!=='rejected');
   if(filterSlot) apps=apps.filter(a=>a.slot===filterSlot);
-  apps.sort((a,b)=>a.status==='pending'?-1:1);
+  apps.sort((a,b)=>{
+    const order={pending:0,paired:1};
+    return (order[a.status]??2)-(order[b.status]??2);
+  });
   if(!apps.length){document.getElementById('applications-list').innerHTML='<div class="empty-state">No applications found.</div>';return;}
   const openSlots=state.slots.filter(s=>s.status==='open');
-  document.getElementById('applications-list').innerHTML=apps.map(a=>{
-    const slot=getSlot(a.slot);
-    const slotOptions=openSlots.map(s=>`<option value="${s.id}"${a.slot===s.id?' selected':''}>${fmt(s.date)}</option>`).join('');
-    return`<div class="app-row">
-      <div class="ainfo">
-        <div class="aname">${a.name}</div>
-        <div class="ameta">${a.email} &bull; ${a.phone||'No phone'} &bull; ${a.dept||'No major given'}</div>
-        <div class="ameta">Slot: ${slot?fmt(slot.date)+' '+fmtTime(slot.time):'Unknown'}</div>
-        ${a.topic?`<div class="ameta">Topic: ${a.topic}</div>`:''}
-        ${a.note?`<div class="ameta">Note: ${a.note}</div>`:''}
-        ${a.status==='pending'?`<div style="margin-top:9px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;font-weight:600">Assign to slot:</span>
-          <select style="width:auto;font-size:12px;padding:5px 9px" onchange="reassignSlot('${a.id}',this.value)">${slotOptions}</select>
-        </div>`:''}
+  document.getElementById('applications-list').innerHTML=apps.map(a=>appRowHTML(a,openSlots,false)).join('');
+  renderRejectedList();
+}
+
+function renderRejectedList(){
+  const rejected=state.applications.filter(a=>a.status==='rejected');
+  if(!rejected.length){document.getElementById('rejected-list').innerHTML='<div class="empty-state">No rejected applications.</div>';return;}
+  document.getElementById('rejected-list').innerHTML=rejected.map(a=>appRowHTML(a,[],true)).join('');
+}
+
+function fmtDateTime(ts){
+  if(!ts) return '—';
+  const d=new Date(ts);
+  return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+}
+
+function appRowHTML(a,openSlots,isRejected){
+  const slot=getSlot(a.slot);
+  const slotOptions=openSlots.map(s=>`<option value="${s.id}"${a.slot===s.id?' selected':''}>${fmt(s.date)}</option>`).join('');
+  const statusBadge=a.status==='pending'?'badge-pending':a.status==='paired'?'badge-paired':a.status==='rejected'?'badge-rejected':'badge-past';
+  return`<div class="app-row">
+    <div class="ainfo">
+      <div class="aname">${a.name}</div>
+      <div class="ameta">${a.email} &bull; ${a.phone||'No phone'} &bull; ${a.dept||'No major given'}</div>
+      <div class="ameta">Slot: ${slot?fmt(slot.date)+' '+fmtTime(slot.time):'Unknown'}</div>
+      ${a.topic?`<div class="ameta">Topic: ${a.topic}</div>`:''}
+      ${a.note?`<div class="ameta">Note: ${a.note}</div>`:''}
+      <div class="ameta" style="color:var(--text3);margin-top:3px">
+        Applied: ${fmtDateTime(a.submitted_at)}
+        ${a.paired_at?` &bull; Paired: ${fmtDateTime(a.paired_at)}`:''}
+        ${a.rejected_at?` &bull; Rejected: ${fmtDateTime(a.rejected_at)}`:''}
       </div>
-      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
-        <span class="badge badge-${a.role==='grad'?'grad':'undergrad'}">${a.role==='grad'?'Graduate':'Undergrad'}</span>
-        <span class="badge badge-${a.status==='pending'?'pending':'filled'}">${a.status}</span>
-      </div>
-      ${a.status==='pending'?`<button class="btn btn-sm btn-primary ml-auto" onclick="pairApplicant('${a.id}')">Confirm &amp; Pair</button>`:''}
-    </div>`;
-  }).join('');
+      ${a.status==='pending'?`<div style="margin-top:9px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;font-weight:600">Assign to slot:</span>
+        <select style="width:auto;font-size:12px;padding:5px 9px" onchange="reassignSlot('${a.id}',this.value)">${slotOptions}</select>
+      </div>`:''}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+      <span class="badge badge-${a.role==='grad'?'grad':'undergrad'}">${a.role==='grad'?'Graduate':'Undergrad'}</span>
+      <span class="badge ${statusBadge}">${a.status}</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end">
+      ${a.status==='pending'?`<button class="btn btn-sm btn-primary" onclick="pairApplicant('${a.id}')">Confirm &amp; Pair</button>`:''}
+      ${a.status==='pending'?`<button class="btn btn-sm btn-danger" onclick="rejectApplicant('${a.id}')">Reject</button>`:''}
+      ${a.status==='paired'?`<button class="btn btn-sm" onclick="openEditModal('${a.id}')">Edit</button>`:''}
+      ${isRejected?`<button class="btn btn-sm" onclick="restoreApplicant('${a.id}')">Restore</button>`:''}
+    </div>
+  </div>`;
 }
 
 async function reassignSlot(appId,newSlotId){
@@ -583,9 +653,19 @@ async function markPast(slotId){
 async function pairApplicant(appId){
   const a=state.applications.find(x=>x.id===appId);
   if(!a) return;
+  const slot=getSlot(a.slot);
+  // Duplicate grad check
+  if(a.role==='grad'&&slot){
+    const existingGrads=getApps(slot.id).filter(x=>x.role==='grad'&&x.status==='paired');
+    if(existingGrads.length>=1){
+      const proceed=confirm(`This slot already has a confirmed graduate instructor (${existingGrads[0].name}).\n\nDo you want to assign two graduate instructors to this slot?`);
+      if(!proceed) return;
+    }
+  }
   try{
-    await sbUpdate('applications',appId,{status:'paired'});a.status='paired';
-    const slot=getSlot(a.slot);
+    const now=new Date().toISOString();
+    await sbUpdate('applications',appId,{status:'paired',paired_at:now});
+    a.status='paired';a.paired_at=now;
     if(slot){
       const team=[...(slot.team||[])];if(!team.includes(appId)) team.push(appId);
       const apps=getApps(slot.id);
@@ -596,6 +676,80 @@ async function pairApplicant(appId){
     }
     renderAdmin();
   }catch(e){alert('Failed to confirm applicant.');}
+}
+
+async function rejectApplicant(appId){
+  if(!confirm('Reject this application? It will be moved to the rejected list.')) return;
+  const a=state.applications.find(x=>x.id===appId);
+  if(!a) return;
+  try{
+    const now=new Date().toISOString();
+    await sbUpdate('applications',appId,{status:'rejected',rejected_at:now});
+    a.status='rejected';a.rejected_at=now;
+    renderAdmin();
+  }catch(e){alert('Failed to reject applicant.');}
+}
+
+async function restoreApplicant(appId){
+  const a=state.applications.find(x=>x.id===appId);
+  if(!a) return;
+  try{
+    await sbUpdate('applications',appId,{status:'pending',rejected_at:null});
+    a.status='pending';a.rejected_at=null;
+    renderAdmin();
+  }catch(e){alert('Failed to restore applicant.');}
+}
+
+let showRejected=false;
+function toggleRejected(){
+  showRejected=!showRejected;
+  document.getElementById('rejected-section').style.display=showRejected?'block':'none';
+  document.getElementById('toggle-rejected-btn').textContent=showRejected?'Hide Rejected':'Show Rejected';
+  if(showRejected) renderRejectedList();
+}
+
+function openEditModal(appId){
+  const a=state.applications.find(x=>x.id===appId);
+  if(!a) return;
+  document.getElementById('edit-app-id').value=appId;
+  document.getElementById('edit-name').value=a.name||'';
+  document.getElementById('edit-email').value=a.email||'';
+  document.getElementById('edit-phone').value=a.phone||'';
+  document.getElementById('edit-role').value=a.role||'grad';
+  document.getElementById('edit-dept').value=a.dept||'';
+  document.getElementById('edit-topic').value=a.topic||'';
+  document.getElementById('edit-note').value=a.note||'';
+  ['edit-success','edit-err'].forEach(id=>document.getElementById(id).style.display='none');
+  const backdrop=document.getElementById('edit-modal-backdrop');
+  backdrop.style.display='flex';
+  document.body.classList.add('modal-open');
+}
+
+function closeEditModal(){
+  document.getElementById('edit-modal-backdrop').style.display='none';
+  document.body.classList.remove('modal-open');
+}
+
+async function saveEditApplication(){
+  const appId=document.getElementById('edit-app-id').value;
+  const a=state.applications.find(x=>x.id===appId);
+  if(!a) return;
+  ['edit-success','edit-err'].forEach(id=>document.getElementById(id).style.display='none');
+  const patch={
+    name:document.getElementById('edit-name').value.trim(),
+    email:document.getElementById('edit-email').value.trim(),
+    phone:document.getElementById('edit-phone').value.trim(),
+    role:document.getElementById('edit-role').value,
+    dept:document.getElementById('edit-dept').value.trim(),
+    topic:document.getElementById('edit-topic').value.trim(),
+    note:document.getElementById('edit-note').value.trim()
+  };
+  try{
+    await sbUpdate('applications',appId,patch);
+    Object.assign(a,patch);
+    document.getElementById('edit-success').style.display='block';
+    setTimeout(()=>{closeEditModal();renderAdmin();},1200);
+  }catch(e){document.getElementById('edit-err').style.display='block';}
 }
 
 async function deleteSlot(slotId){
@@ -640,10 +794,10 @@ function exportExcel(type){
       })];
   }else{
     filename='lums_math_circle_applications.csv';
-    rows=[['ID','Name','Email','Phone','Role','Major','Slot Date','Topic','Note','Status'],
+    rows=[['ID','Name','Email','Phone','Role','Major','Slot Date','Topic','Note','Status','Submitted At','Paired At','Rejected At'],
       ...state.applications.map(a=>{
         const slot=getSlot(a.slot);
-        return[a.id,a.name,a.email,a.phone||'',a.role,a.dept||'',slot?slot.date:'',a.topic||'',a.note||'',a.status];
+        return[a.id,a.name,a.email,a.phone||'',a.role,a.dept||'',slot?slot.date:'',a.topic||'',a.note||'',a.status,fmtDateTime(a.submitted_at),fmtDateTime(a.paired_at),fmtDateTime(a.rejected_at)];
       })];
   }
   const csv=rows.map(r=>r.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
