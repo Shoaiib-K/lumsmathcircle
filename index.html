@@ -56,6 +56,10 @@ select option{background:var(--bg3)}
 .btn-primary{background:var(--info-bg);color:var(--info-text);border-color:var(--info-border)}
 .btn-primary:hover{background:rgba(55,138,221,0.18)}
 .btn-sm{padding:4px 10px;font-size:11px}
+.btn-danger{background:var(--danger-bg);color:var(--danger-text);border-color:rgba(226,75,74,0.25)}
+.btn-danger:hover{background:rgba(226,75,74,0.2)}
+.btn-export{background:rgba(99,153,34,0.12);color:#97c459;border-color:rgba(99,153,34,0.25)}
+.btn-export:hover{background:rgba(99,153,34,0.2)}
 .slot-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border);flex-wrap:wrap}
 .slot-row:last-child{border-bottom:none}
 .slot-date{font-weight:500;min-width:130px;font-size:13px;color:var(--text)}
@@ -197,7 +201,9 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.7)}
     <div id="admin-panel" style="display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px">
         <div class="section-title" style="margin-bottom:0">Admin Dashboard</div>
-        <div style="display:flex;gap:8px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-sm btn-export" onclick="exportExcel('slots')">↓ Export Slots</button>
+          <button class="btn btn-sm btn-export" onclick="exportExcel('applications')">↓ Export Applications</button>
           <button class="btn btn-sm" onclick="loadAll().then(renderAdmin)">↻ Refresh</button>
           <button class="btn btn-sm" onclick="signOut()">Sign out</button>
         </div>
@@ -464,7 +470,10 @@ function renderSlotsList() {
           ${ug ? `<span class="badge badge-undergrad">${ug.name}</span>` : '<span style="font-size:10px;color:var(--text3)">No undergrad</span>'}
         </div>
       </div>
-      ${!isPast ? `<button class="btn btn-sm" onclick="markPast('${s.id}')">Mark past</button>` : ''}
+      <div style="display:flex;flex-direction:column;gap:5px">
+        ${!isPast ? `<button class="btn btn-sm" onclick="markPast('${s.id}')">Mark past</button>` : ''}
+        <button class="btn btn-sm btn-danger" onclick="deleteSlot('${s.id}')">Delete</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -589,6 +598,51 @@ async function addSlot() {
     document.getElementById('slot-add-err').style.display = 'block';
   }
   document.getElementById('slot-spinner').style.display = 'none';
+}
+
+async function deleteSlot(slotId) {
+  if (!confirm('Delete this slot? All applications linked to it will also be removed.')) return;
+  try {
+    const linked = state.applications.filter(a => a.slot === slotId);
+    for (const a of linked) {
+      await fetch(`${SUPABASE_URL}/rest/v1/applications?id=eq.${a.id}`, { method: 'DELETE', headers: HEADERS });
+    }
+    await fetch(`${SUPABASE_URL}/rest/v1/slots?id=eq.${slotId}`, { method: 'DELETE', headers: HEADERS });
+    state.slots = state.slots.filter(s => s.id !== slotId);
+    state.applications = state.applications.filter(a => a.slot !== slotId);
+    renderAdmin();
+  } catch(e) { alert('Failed to delete slot. Try again.'); }
+}
+
+function exportExcel(type) {
+  let rows, filename;
+  if (type === 'slots') {
+    filename = 'lums_math_circle_slots.csv';
+    rows = [
+      ['ID','Date','Time','Status','School','Grad Instructor','Undergrad Instructor'],
+      ...state.slots.sort((a,b)=>a.date.localeCompare(b.date)).map(s => {
+        const apps = getApps(s.id);
+        const grad = apps.find(a => a.role==='grad' && a.status==='paired');
+        const ug = apps.find(a => a.role==='undergrad' && a.status==='paired');
+        return [s.id, s.date, fmtTime(s.time), s.status, s.school||'', grad?grad.name:'', ug?ug.name:''];
+      })
+    ];
+  } else {
+    filename = 'lums_math_circle_applications.csv';
+    rows = [
+      ['ID','Name','Email','Role','Department','Slot Date','Topic','Note','Status'],
+      ...state.applications.map(a => {
+        const slot = getSlot(a.slot);
+        return [a.id, a.name, a.email, a.role, a.dept||'', slot?slot.date:'', a.topic||'', a.note||'', a.status];
+      })
+    ];
+  }
+  const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
 }
 
 initPublic();
