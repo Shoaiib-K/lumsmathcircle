@@ -10,7 +10,7 @@
 --bg:#0d1117;--bg2:#161b22;--bg3:#1c2230;--bg4:#212836;
 --text:#e6edf3;--text2:#8b949e;--text3:#484f58;
 --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
---blue50:#e6f1fb;--blue100:#b5d4f4;--blue200:#85b7eb;--blue400:#378add;--blue600:#185fa5;--blue700:#0f4a82;--blue800:#0c447c;--blue900:#042c53;
+--blue200:#85b7eb;--blue400:#378add;--blue600:#185fa5;--blue800:#0c447c;
 --info-bg:rgba(55,138,221,0.12);--info-text:#85b7eb;--info-border:rgba(55,138,221,0.25);
 --success-bg:rgba(99,153,34,0.12);--success-text:#97c459;
 --warn-bg:rgba(239,159,39,0.12);--warn-text:#fac775;
@@ -36,7 +36,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .metric{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:.9rem 1rem;text-align:center}
 .metric-num{font-size:26px;font-weight:500;line-height:1.1;color:var(--blue200)}
 .metric-label{font-size:10px;color:var(--text2);margin-top:3px;text-transform:uppercase;letter-spacing:0.05em}
-.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:var(--radius);font-size:11px;font-weight:500;white-space:nowrap;gap:4px}
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:var(--radius);font-size:11px;font-weight:500;white-space:nowrap}
 .badge-open{background:var(--success-bg);color:var(--success-text)}
 .badge-filled{background:var(--info-bg);color:var(--info-text)}
 .badge-past{background:rgba(255,255,255,0.05);color:var(--text2)}
@@ -50,13 +50,12 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue400)
 select option{background:var(--bg3)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:520px){.row2{grid-template-columns:1fr}}
-.btn{padding:7px 16px;border:0.5px solid var(--border2);border-radius:var(--radius);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-weight:500;font-family:var(--font);transition:background 0.15s,border-color 0.15s}
-.btn:hover{background:var(--bg3);border-color:var(--border2)}
+.btn{padding:7px 16px;border:0.5px solid var(--border2);border-radius:var(--radius);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-weight:500;font-family:var(--font);transition:background 0.15s}
+.btn:hover{background:var(--bg3)}
 .btn:active{transform:scale(0.98)}
 .btn-primary{background:var(--info-bg);color:var(--info-text);border-color:var(--info-border)}
 .btn-primary:hover{background:rgba(55,138,221,0.18)}
 .btn-sm{padding:4px 10px;font-size:11px}
-.btn-danger{background:var(--danger-bg);color:var(--danger-text);border-color:transparent}
 .slot-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border);flex-wrap:wrap}
 .slot-row:last-child{border-bottom:none}
 .slot-date{font-weight:500;min-width:130px;font-size:13px;color:var(--text)}
@@ -90,14 +89,17 @@ select option{background:var(--bg3)}
 .alert-success{background:var(--success-bg);color:var(--success-text)}
 .alert-warning{background:var(--warn-bg);color:var(--warn-text)}
 .alert-danger{background:var(--danger-bg);color:var(--danger-text)}
+.alert-info{background:var(--info-bg);color:var(--info-text)}
 .divider{border:none;border-top:0.5px solid var(--border);margin:1.5rem 0}
 .empty-state{text-align:center;padding:2rem 1rem;color:var(--text3);font-size:13px}
 .how-it-works{font-size:12px;color:var(--text2);line-height:2.1}
 .team-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
 .footer{text-align:center;padding:1.5rem;font-size:11px;color:var(--text3);border-top:0.5px solid var(--border);margin-top:2rem}
-.accent-line{width:2px;height:36px;background:var(--blue600);border-radius:2px;flex-shrink:0}
-.slot-actions{display:flex;flex-direction:column;gap:5px;align-items:flex-end}
+.accent-line{width:2px;height:36px;border-radius:2px;flex-shrink:0}
 .edit-row{display:flex;gap:6px;align-items:center;margin-top:5px}
+.loading{text-align:center;padding:2rem;color:var(--text2);font-size:13px}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border2);border-top-color:var(--blue400);border-radius:50%;animation:spin 0.7s linear infinite;margin-right:8px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
 input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.7)}
 </style>
 </head>
@@ -112,6 +114,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.7)}
   </nav>
 </div>
 
+<!-- PUBLIC PAGE -->
 <div class="page active" id="page-public">
   <div class="container">
     <div class="public-header">
@@ -119,15 +122,17 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.7)}
       <h1>School Sessions</h1>
       <p>Student-led mathematics sessions at schools across Lahore, organised by LUMS Math Circle.</p>
     </div>
-    <div id="public-upcoming-label" class="section-label">Upcoming &amp; confirmed</div>
+    <div id="public-loading" class="loading"><span class="spinner"></span>Loading sessions...</div>
+    <div id="public-upcoming-label" class="section-label" style="display:none">Upcoming &amp; confirmed</div>
     <div id="public-slots"></div>
     <div id="public-empty" class="empty-state" style="display:none">No upcoming sessions yet.</div>
-    <div id="public-past-label" class="section-label" style="margin-top:1.5rem">Past sessions</div>
+    <div id="public-past-label" class="section-label" style="margin-top:1.5rem;display:none">Past sessions</div>
     <div id="public-past"></div>
     <div id="public-past-empty" class="empty-state" style="display:none">No past sessions recorded.</div>
   </div>
 </div>
 
+<!-- APPLY PAGE -->
 <div class="page" id="page-apply">
   <div class="container">
     <div class="section-title">Apply for a session slot</div>
@@ -137,7 +142,8 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.7)}
         <div><label>LUMS email *</label><input type="email" id="app-email" placeholder="xyz@lums.edu.pk"></div>
       </div>
       <div class="row2">
-        <div><label>Your role *</label>
+        <div>
+          <label>Your role *</label>
           <select id="app-role">
             <option value="">Select role</option>
             <option value="grad">Graduate student</option>
@@ -154,9 +160,11 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.7)}
       <textarea id="app-note" rows="2" placeholder="Any extra information for the admin team..."></textarea>
       <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
         <button class="btn btn-primary" onclick="submitApplication()">Submit application</button>
+        <span id="apply-spinner" style="display:none"><span class="spinner"></span></span>
       </div>
       <div id="apply-success" class="alert alert-success">Application submitted. We will review and confirm your slot soon.</div>
       <div id="apply-err" class="alert alert-warning">Please fill in all required fields marked with *.</div>
+      <div id="apply-dberr" class="alert alert-danger">Something went wrong. Please try again.</div>
     </div>
     <div class="card">
       <div style="font-size:12px;font-weight:500;margin-bottom:8px;color:var(--text2)">How this works</div>
@@ -171,6 +179,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.7)}
   </div>
 </div>
 
+<!-- ADMIN PAGE -->
 <div class="page" id="page-admin">
   <div class="container">
     <div id="admin-gate">
@@ -188,8 +197,14 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.7)}
     <div id="admin-panel" style="display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px">
         <div class="section-title" style="margin-bottom:0">Admin Dashboard</div>
-        <button class="btn btn-sm" onclick="signOut()">Sign out</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-sm" onclick="loadAll().then(renderAdmin)">↻ Refresh</button>
+          <button class="btn btn-sm" onclick="signOut()">Sign out</button>
+        </div>
       </div>
+
+      <div id="admin-db-err" class="alert alert-danger" style="margin-bottom:12px">Database error. Check your connection.</div>
+
       <div class="metrics" id="admin-metrics"></div>
 
       <div class="section-title">Session slots</div>
@@ -199,13 +214,15 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.7)}
           <div><label>Date</label><input type="date" id="slot-date"></div>
           <div><label>Time</label><input type="time" id="slot-time" value="09:00"></div>
         </div>
-        <div style="margin-top:10px"><button class="btn btn-primary btn-sm" onclick="addSlot()">Add slot</button></div>
+        <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+          <button class="btn btn-primary btn-sm" onclick="addSlot()">Add slot</button>
+          <span id="slot-spinner" style="display:none"><span class="spinner"></span></span>
+        </div>
         <div id="slot-add-success" class="alert alert-success">Slot added.</div>
+        <div id="slot-add-err" class="alert alert-danger">Failed to add slot. Try again.</div>
       </div>
 
-      <div class="card" id="slots-card">
-        <div id="slots-list"></div>
-      </div>
+      <div class="card"><div id="slots-list"></div></div>
 
       <hr class="divider">
 
@@ -215,9 +232,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.7)}
           <option value="">All slots</option>
         </select>
       </div>
-      <div class="card">
-        <div id="applications-list"></div>
-      </div>
+      <div class="card"><div id="applications-list"></div></div>
     </div>
   </div>
 </div>
@@ -225,116 +240,186 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.7)}
 <footer class="footer">LUMS Math Circle — Outreach Session Manager &bull; Managed by Shoaib &amp; Dr. Imran Anwar</footer>
 
 <script>
-const ADMIN_PASSWORD = "lumsmathcircle2025";
-let state = {
-  slots: [
-    {id:'s1',date:'2025-05-12',time:'09:00',status:'open',school:'',team:[]},
-    {id:'s2',date:'2025-05-26',time:'09:00',status:'open',school:'',team:[]},
-    {id:'s3',date:'2025-06-09',time:'09:00',status:'filled',school:'Lahore Grammar School, DHA',team:['a1','a2']},
-    {id:'s4',date:'2025-03-17',time:'09:00',status:'past',school:'Beaconhouse School System',team:['a3','a4']},
-  ],
-  applications: [
-    {id:'a1',name:'Sara Ahmed',email:'sara@lums.edu.pk',role:'grad',dept:'PhD Mathematics',slot:'s3',topic:'Graph theory',note:'',status:'paired'},
-    {id:'a2',name:'Bilal Khan',email:'bilal@lums.edu.pk',role:'undergrad',dept:'BSc Mathematics Yr3',slot:'s3',topic:'Graph theory',note:'',status:'paired'},
-    {id:'a3',name:'Nadia Malik',email:'nadia@lums.edu.pk',role:'grad',dept:'MSc Mathematics',slot:'s4',topic:'Combinatorics',note:'',status:'paired'},
-    {id:'a4',name:'Hamza Raza',email:'hamza@lums.edu.pk',role:'undergrad',dept:'BSc CS Yr2',slot:'s4',topic:'',note:'',status:'paired'},
-    {id:'a5',name:'Ayesha Farooq',email:'ayesha@lums.edu.pk',role:'grad',dept:'PhD Mathematics',slot:'s1',topic:'Number theory',note:'',status:'pending'},
-    {id:'a6',name:'Zain Ul Abidin',email:'zain@lums.edu.pk',role:'undergrad',dept:'BSc Mathematics Yr2',slot:'s1',topic:'',note:'',status:'pending'},
-    {id:'a7',name:'Mariam Tariq',email:'mariam@lums.edu.pk',role:'grad',dept:'MSc Applied Mathematics',slot:'s2',topic:'Geometry',note:'',status:'pending'},
-  ]
+const ADMIN_PASSWORD = "lms2026lahore";
+const SUPABASE_URL = "https://cqulxlcwcyloggzvuumz.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxdWx4bGN3Y3lsb2dnenZ1dW16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMzE1NTgsImV4cCI6MjA5MTgwNzU1OH0.rhTtQXl7aeJZp66uZquVaXP-tlPbJnDRp5K468orbHs";
+
+const HEADERS = {
+  "Content-Type": "application/json",
+  "apikey": SUPABASE_KEY,
+  "Authorization": "Bearer " + SUPABASE_KEY,
+  "Prefer": "return=representation"
 };
 
-function fmt(d){const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long',year:'numeric'})}
-function fmtShort(d){const dt=new Date(d+'T00:00:00');return{day:dt.getDate(),month:dt.toLocaleDateString('en-GB',{month:'short'})}}
-function fmtTime(t){const[h,m]=t.split(':');const hh=parseInt(h);return(hh>12?hh-12:hh===0?12:hh)+':'+(m||'00')+' '+(hh>=12?'PM':'AM')}
-function getSlot(id){return state.slots.find(s=>s.id===id)}
-function getApps(slotId){return state.applications.filter(a=>a.slot===slotId)}
+let state = { slots: [], applications: [] };
 
-function showPage(p){
-  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
-  document.getElementById('page-'+p).classList.add('active');
-  const map={public:0,apply:1,admin:2};
+async function sbGet(table) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=*`, { headers: HEADERS });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+async function sbInsert(table, row) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+    method: "POST", headers: HEADERS, body: JSON.stringify(row)
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+async function sbUpdate(table, id, patch) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+    method: "PATCH", headers: HEADERS, body: JSON.stringify(patch)
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+async function loadAll() {
+  const [slots, applications] = await Promise.all([sbGet('slots'), sbGet('applications')]);
+  state.slots = slots;
+  state.applications = applications;
+}
+
+function fmt(d) {
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' });
+}
+function fmtShort(d) {
+  const dt = new Date(d + 'T00:00:00');
+  return { day: dt.getDate(), month: dt.toLocaleDateString('en-GB', { month: 'short' }) };
+}
+function fmtTime(t) {
+  const [h, m] = t.split(':');
+  const hh = parseInt(h);
+  return (hh > 12 ? hh - 12 : hh === 0 ? 12 : hh) + ':' + (m || '00') + ' ' + (hh >= 12 ? 'PM' : 'AM');
+}
+function getSlot(id) { return state.slots.find(s => s.id === id); }
+function getApps(slotId) { return state.applications.filter(a => a.slot === slotId); }
+
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(x => x.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  const map = { public: 0, apply: 1, admin: 2 };
   document.querySelectorAll('.nav-btn')[map[p]].classList.add('active');
-  if(p==='public') renderPublic();
-  if(p==='apply') renderApplySlots();
-  if(p==='admin'&&document.getElementById('admin-panel').style.display!=='none') renderAdmin();
+  if (p === 'public') initPublic();
+  if (p === 'apply') initApply();
+  if (p === 'admin' && document.getElementById('admin-panel').style.display !== 'none') loadAll().then(renderAdmin);
 }
 
-function renderPublic(){
-  const upcoming=state.slots.filter(s=>s.status!=='past').sort((a,b)=>a.date.localeCompare(b.date));
-  const past=state.slots.filter(s=>s.status==='past').sort((a,b)=>b.date.localeCompare(a.date));
-  const el=document.getElementById('public-slots');
-  const em=document.getElementById('public-empty');
-  const pel=document.getElementById('public-past');
-  const pem=document.getElementById('public-past-empty');
-
-  if(!upcoming.length){el.innerHTML='';em.style.display='block';}
-  else{em.style.display='none';el.innerHTML=upcoming.map(s=>slotCardHTML(s,false)).join('');}
-
-  if(!past.length){pel.innerHTML='';pem.style.display='block';}
-  else{pem.style.display='none';pel.innerHTML=past.map(s=>slotCardHTML(s,true)).join('');}
+async function initPublic() {
+  document.getElementById('public-loading').style.display = 'block';
+  document.getElementById('public-upcoming-label').style.display = 'none';
+  document.getElementById('public-past-label').style.display = 'none';
+  try {
+    await loadAll();
+    renderPublic();
+  } catch(e) {
+    document.getElementById('public-loading').innerHTML = 'Failed to load sessions. Please refresh.';
+  }
 }
 
-function slotCardHTML(s,isPast){
-  const{day,month}=fmtShort(s.date);
-  const apps=getApps(s.id);
-  const team=apps.filter(a=>a.status==='paired').map(a=>a.name).join(' & ');
-  const badgeCls=s.status==='open'?'badge-open':s.status==='filled'?'badge-filled':'badge-past';
-  const badgeLabel=s.status==='open'?'Open':s.status==='filled'?'Confirmed':'Past';
-  return`<div class="slot-card-public${isPast?' past-card':''}">
+async function initApply() {
+  await loadAll();
+  renderApplySlots();
+}
+
+function renderPublic() {
+  document.getElementById('public-loading').style.display = 'none';
+  const upcoming = state.slots.filter(s => s.status !== 'past').sort((a, b) => a.date.localeCompare(b.date));
+  const past = state.slots.filter(s => s.status === 'past').sort((a, b) => b.date.localeCompare(a.date));
+  const el = document.getElementById('public-slots');
+  const em = document.getElementById('public-empty');
+  const pel = document.getElementById('public-past');
+  const pem = document.getElementById('public-past-empty');
+  const ul = document.getElementById('public-upcoming-label');
+  const pl = document.getElementById('public-past-label');
+
+  if (!upcoming.length) { el.innerHTML = ''; em.style.display = 'block'; ul.style.display = 'none'; }
+  else { em.style.display = 'none'; ul.style.display = 'block'; el.innerHTML = upcoming.map(s => slotCardHTML(s, false)).join(''); }
+
+  if (!past.length) { pel.innerHTML = ''; pem.style.display = 'block'; pl.style.display = 'none'; }
+  else { pem.style.display = 'none'; pl.style.display = 'block'; pel.innerHTML = past.map(s => slotCardHTML(s, true)).join(''); }
+}
+
+function slotCardHTML(s, isPast) {
+  const { day, month } = fmtShort(s.date);
+  const apps = getApps(s.id);
+  const team = apps.filter(a => a.status === 'paired').map(a => a.name).join(' & ');
+  const badgeCls = s.status === 'open' ? 'badge-open' : s.status === 'filled' ? 'badge-filled' : 'badge-past';
+  const badgeLabel = s.status === 'open' ? 'Open' : s.status === 'filled' ? 'Confirmed' : 'Past';
+  return `<div class="slot-card-public${isPast ? ' past-card' : ''}">
     <div class="date-block"><div class="day">${day}</div><div class="month">${month}</div></div>
     <div class="slot-info">
       <div class="slot-title">${fmt(s.date)}</div>
-      <div class="slot-sub">${fmtTime(s.time)} &bull; ${s.school||'School to be confirmed'} &bull; ${team||'Team being assembled'}</div>
+      <div class="slot-sub">${fmtTime(s.time)} &bull; ${s.school || 'School to be confirmed'} &bull; ${team || 'Team being assembled'}</div>
     </div>
     <span class="badge ${badgeCls}">${badgeLabel}</span>
   </div>`;
 }
 
-function renderApplySlots(){
-  const open=state.slots.filter(s=>s.status==='open').sort((a,b)=>a.date.localeCompare(b.date));
-  const sel=document.getElementById('app-slot');
-  sel.innerHTML='<option value="">Select an available slot</option>'+open.map(s=>`<option value="${s.id}">${fmt(s.date)} at ${fmtTime(s.time)}</option>`).join('');
+function renderApplySlots() {
+  const open = state.slots.filter(s => s.status === 'open').sort((a, b) => a.date.localeCompare(b.date));
+  const sel = document.getElementById('app-slot');
+  sel.innerHTML = '<option value="">Select an available slot</option>' +
+    open.map(s => `<option value="${s.id}">${fmt(s.date)} at ${fmtTime(s.time)}</option>`).join('');
 }
 
-function submitApplication(){
-  const name=document.getElementById('app-name').value.trim();
-  const email=document.getElementById('app-email').value.trim();
-  const role=document.getElementById('app-role').value;
-  const slot=document.getElementById('app-slot').value;
-  const err=document.getElementById('apply-err');
-  const succ=document.getElementById('apply-success');
-  err.style.display='none';succ.style.display='none';
-  if(!name||!email||!role||!slot){err.style.display='block';return;}
-  state.applications.push({id:'a'+Date.now(),name,email,role,dept:document.getElementById('app-dept').value,slot,topic:document.getElementById('app-topic').value,note:document.getElementById('app-note').value,status:'pending'});
-  succ.style.display='block';
-  ['app-name','app-email','app-dept','app-topic','app-note'].forEach(f=>document.getElementById(f).value='');
-  document.getElementById('app-role').value='';document.getElementById('app-slot').value='';
-  setTimeout(()=>succ.style.display='none',5000);
+async function submitApplication() {
+  const name = document.getElementById('app-name').value.trim();
+  const email = document.getElementById('app-email').value.trim();
+  const role = document.getElementById('app-role').value;
+  const slot = document.getElementById('app-slot').value;
+  ['apply-success','apply-err','apply-dberr'].forEach(id => document.getElementById(id).style.display = 'none');
+  if (!name || !email || !role || !slot) { document.getElementById('apply-err').style.display = 'block'; return; }
+  document.getElementById('apply-spinner').style.display = 'inline';
+  try {
+    const row = {
+      id: 'a' + Date.now(), name, email, role,
+      dept: document.getElementById('app-dept').value,
+      slot, topic: document.getElementById('app-topic').value,
+      note: document.getElementById('app-note').value, status: 'pending'
+    };
+    await sbInsert('applications', row);
+    state.applications.push(row);
+    document.getElementById('apply-success').style.display = 'block';
+    ['app-name','app-email','app-dept','app-topic','app-note'].forEach(f => document.getElementById(f).value = '');
+    document.getElementById('app-role').value = '';
+    document.getElementById('app-slot').value = '';
+    setTimeout(() => document.getElementById('apply-success').style.display = 'none', 5000);
+  } catch(e) {
+    document.getElementById('apply-dberr').style.display = 'block';
+  }
+  document.getElementById('apply-spinner').style.display = 'none';
 }
 
-function checkAdmin(){
-  document.getElementById('admin-err').style.display='none';
-  if(document.getElementById('admin-pass').value===ADMIN_PASSWORD){
-    document.getElementById('admin-gate').style.display='none';
-    document.getElementById('admin-panel').style.display='block';
-    renderAdmin();
-  } else{document.getElementById('admin-err').style.display='block';}
+function checkAdmin() {
+  document.getElementById('admin-err').style.display = 'none';
+  if (document.getElementById('admin-pass').value === ADMIN_PASSWORD) {
+    document.getElementById('admin-gate').style.display = 'none';
+    document.getElementById('admin-panel').style.display = 'block';
+    loadAll().then(renderAdmin).catch(() => {
+      document.getElementById('admin-db-err').style.display = 'block';
+    });
+  } else {
+    document.getElementById('admin-err').style.display = 'block';
+  }
 }
 
-function signOut(){
-  document.getElementById('admin-panel').style.display='none';
-  document.getElementById('admin-gate').style.display='block';
-  document.getElementById('admin-pass').value='';
+function signOut() {
+  document.getElementById('admin-panel').style.display = 'none';
+  document.getElementById('admin-gate').style.display = 'block';
+  document.getElementById('admin-pass').value = '';
 }
 
-function renderAdmin(){
-  const open=state.slots.filter(s=>s.status==='open').length;
-  const confirmed=state.slots.filter(s=>s.status==='filled').length;
-  const past=state.slots.filter(s=>s.status==='past').length;
-  const pending=state.applications.filter(a=>a.status==='pending').length;
-  document.getElementById('admin-metrics').innerHTML=`
+function renderAdmin() {
+  document.getElementById('admin-db-err').style.display = 'none';
+  const open = state.slots.filter(s => s.status === 'open').length;
+  const confirmed = state.slots.filter(s => s.status === 'filled').length;
+  const past = state.slots.filter(s => s.status === 'past').length;
+  const pending = state.applications.filter(a => a.status === 'pending').length;
+  document.getElementById('admin-metrics').innerHTML = `
     <div class="metric"><div class="metric-num">${state.slots.length}</div><div class="metric-label">Total slots</div></div>
     <div class="metric"><div class="metric-num">${open}</div><div class="metric-label">Open</div></div>
     <div class="metric"><div class="metric-num">${confirmed}</div><div class="metric-label">Confirmed</div></div>
@@ -345,139 +430,168 @@ function renderAdmin(){
   renderAppsList();
 }
 
-function renderSlotsList(){
-  const sorted=[...state.slots].sort((a,b)=>a.date.localeCompare(b.date));
-  if(!sorted.length){document.getElementById('slots-list').innerHTML='<div class="empty-state">No slots added yet.</div>';return;}
-  document.getElementById('slots-list').innerHTML=sorted.map(s=>{
-    const apps=getApps(s.id);
-    const grad=apps.find(a=>a.role==='grad'&&a.status==='paired');
-    const ug=apps.find(a=>a.role==='undergrad'&&a.status==='paired');
-    const isPast=s.status==='past';
-    return`<div class="slot-row">
-      <div class="accent-line" style="background:${s.status==='open'?'var(--blue600)':s.status==='filled'?'var(--blue400)':'var(--text3)'}"></div>
+function renderSlotsList() {
+  const sorted = [...state.slots].sort((a, b) => a.date.localeCompare(b.date));
+  if (!sorted.length) { document.getElementById('slots-list').innerHTML = '<div class="empty-state">No slots added yet.</div>'; return; }
+  document.getElementById('slots-list').innerHTML = sorted.map(s => {
+    const apps = getApps(s.id);
+    const grad = apps.find(a => a.role === 'grad' && a.status === 'paired');
+    const ug = apps.find(a => a.role === 'undergrad' && a.status === 'paired');
+    const isPast = s.status === 'past';
+    const accentColor = s.status === 'open' ? 'var(--blue600)' : s.status === 'filled' ? 'var(--blue400)' : 'var(--text3)';
+    return `<div class="slot-row">
+      <div class="accent-line" style="background:${accentColor}"></div>
       <div style="min-width:130px">
         <div class="slot-date">${fmt(s.date)}</div>
         <div class="slot-time">${fmtTime(s.time)}</div>
       </div>
-      <span class="badge badge-${s.status==='open'?'open':s.status==='filled'?'filled':'past'}">${s.status}</span>
+      <span class="badge badge-${s.status === 'open' ? 'open' : s.status === 'filled' ? 'filled' : 'past'}">${s.status}</span>
       <div style="flex:1;min-width:150px">
         ${!isPast
-          ?`<div class="edit-row">
-              <input type="text" placeholder="Assign school..." value="${s.school||''}" style="font-size:11px;padding:5px 8px;" id="school-${s.id}" onchange="updateSchool('${s.id}',this.value)">
-            </div>
-            <div class="edit-row" style="margin-top:4px">
-              <input type="date" value="${s.date}" style="font-size:11px;padding:4px 7px;" id="edate-${s.id}">
-              <input type="time" value="${s.time}" style="font-size:11px;padding:4px 7px;width:90px" id="etime-${s.id}">
-              <button class="btn btn-sm" onclick="editSlot('${s.id}')">Save</button>
-            </div>`
-          :`<span style="font-size:12px;color:var(--text2)">${s.school||'—'}</span>`}
+          ? `<div class="edit-row">
+               <input type="text" placeholder="Assign school..." value="${s.school || ''}" style="font-size:11px;padding:5px 8px" onchange="updateSchool('${s.id}',this.value)">
+             </div>
+             <div class="edit-row" style="margin-top:4px">
+               <input type="date" value="${s.date}" style="font-size:11px;padding:4px 7px" id="edate-${s.id}">
+               <input type="time" value="${s.time}" style="font-size:11px;padding:4px 7px;width:90px" id="etime-${s.id}">
+               <button class="btn btn-sm" onclick="editSlot('${s.id}')">Save</button>
+             </div>`
+          : `<span style="font-size:12px;color:var(--text2)">${s.school || '—'}</span>`}
       </div>
       <div style="min-width:160px">
         <div class="team-tags">
-          ${grad?`<span class="badge badge-grad">${grad.name}</span>`:'<span style="font-size:10px;color:var(--text3)">No grad</span>'}
-          ${ug?`<span class="badge badge-undergrad">${ug.name}</span>`:'<span style="font-size:10px;color:var(--text3)">No undergrad</span>'}
+          ${grad ? `<span class="badge badge-grad">${grad.name}</span>` : '<span style="font-size:10px;color:var(--text3)">No grad</span>'}
+          ${ug ? `<span class="badge badge-undergrad">${ug.name}</span>` : '<span style="font-size:10px;color:var(--text3)">No undergrad</span>'}
         </div>
       </div>
-      ${!isPast?`<button class="btn btn-sm" onclick="markPast('${s.id}')">Mark past</button>`:''}
+      ${!isPast ? `<button class="btn btn-sm" onclick="markPast('${s.id}')">Mark past</button>` : ''}
     </div>`;
   }).join('');
 }
 
-function editSlot(slotId){
-  const s=getSlot(slotId);
-  if(!s) return;
-  const newDate=document.getElementById('edate-'+slotId).value;
-  const newTime=document.getElementById('etime-'+slotId).value;
-  if(newDate) s.date=newDate;
-  if(newTime) s.time=newTime;
-  renderAdmin();
+function renderFilterSlots() {
+  const sel = document.getElementById('filter-slot');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All slots</option>' +
+    [...state.slots].sort((a, b) => a.date.localeCompare(b.date))
+      .map(s => `<option value="${s.id}"${s.id === cur ? ' selected' : ''}>${fmt(s.date)}</option>`).join('');
 }
 
-function renderFilterSlots(){
-  const sel=document.getElementById('filter-slot');
-  const cur=sel.value;
-  sel.innerHTML='<option value="">All slots</option>'+[...state.slots].sort((a,b)=>a.date.localeCompare(b.date)).map(s=>`<option value="${s.id}"${s.id===cur?' selected':''}>${fmt(s.date)}</option>`).join('');
-}
-
-function renderAppsList(){
-  const filterSlot=document.getElementById('filter-slot')?.value||'';
-  let apps=[...state.applications];
-  if(filterSlot) apps=apps.filter(a=>a.slot===filterSlot);
-  apps.sort((a,b)=>a.status==='pending'?-1:1);
-
-  if(!apps.length){document.getElementById('applications-list').innerHTML='<div class="empty-state">No applications found.</div>';return;}
-
-  const openSlots=state.slots.filter(s=>s.status==='open');
-
-  document.getElementById('applications-list').innerHTML=apps.map(a=>{
-    const slot=getSlot(a.slot);
-    const slotOptions=openSlots.map(s=>`<option value="${s.id}"${a.slot===s.id?' selected':''}>${fmt(s.date)}</option>`).join('');
-    return`<div class="app-row">
+function renderAppsList() {
+  const filterSlot = document.getElementById('filter-slot')?.value || '';
+  let apps = [...state.applications];
+  if (filterSlot) apps = apps.filter(a => a.slot === filterSlot);
+  apps.sort((a, b) => a.status === 'pending' ? -1 : 1);
+  if (!apps.length) { document.getElementById('applications-list').innerHTML = '<div class="empty-state">No applications found.</div>'; return; }
+  const openSlots = state.slots.filter(s => s.status === 'open');
+  document.getElementById('applications-list').innerHTML = apps.map(a => {
+    const slot = getSlot(a.slot);
+    const slotOptions = openSlots.map(s => `<option value="${s.id}"${a.slot === s.id ? ' selected' : ''}>${fmt(s.date)}</option>`).join('');
+    return `<div class="app-row">
       <div class="ainfo">
         <div class="aname">${a.name}</div>
-        <div class="ameta">${a.email} &bull; ${a.dept||'No dept given'}</div>
-        <div class="ameta">Slot: ${slot?fmt(slot.date)+' '+fmtTime(slot.time):'Unknown'}</div>
-        ${a.topic?`<div class="ameta">Topic: ${a.topic}</div>`:''}
-        ${a.note?`<div class="ameta">Note: ${a.note}</div>`:''}
-        ${a.status==='pending'?`<div style="margin-top:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <div class="ameta">${a.email} &bull; ${a.dept || 'No dept given'}</div>
+        <div class="ameta">Slot: ${slot ? fmt(slot.date) + ' ' + fmtTime(slot.time) : 'Unknown'}</div>
+        ${a.topic ? `<div class="ameta">Topic: ${a.topic}</div>` : ''}
+        ${a.note ? `<div class="ameta">Note: ${a.note}</div>` : ''}
+        ${a.status === 'pending' ? `<div style="margin-top:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
           <span style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em">Assign to slot:</span>
           <select style="width:auto;font-size:11px;padding:4px 7px" onchange="reassignSlot('${a.id}',this.value)">
             ${slotOptions}
           </select>
-        </div>`:''}
+        </div>` : ''}
       </div>
       <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end">
-        <span class="badge badge-${a.role==='grad'?'grad':'undergrad'}">${a.role==='grad'?'Graduate':'Undergrad'}</span>
-        <span class="badge badge-${a.status==='pending'?'pending':'filled'}">${a.status}</span>
+        <span class="badge badge-${a.role === 'grad' ? 'grad' : 'undergrad'}">${a.role === 'grad' ? 'Graduate' : 'Undergrad'}</span>
+        <span class="badge badge-${a.status === 'pending' ? 'pending' : 'filled'}">${a.status}</span>
       </div>
-      ${a.status==='pending'?`<button class="btn btn-sm btn-primary ml-auto" onclick="pairApplicant('${a.id}')">Confirm &amp; pair</button>`:''}
+      ${a.status === 'pending' ? `<button class="btn btn-sm btn-primary ml-auto" onclick="pairApplicant('${a.id}')">Confirm &amp; pair</button>` : ''}
     </div>`;
   }).join('');
 }
 
-function reassignSlot(appId,newSlotId){
-  const a=state.applications.find(x=>x.id===appId);
-  if(a&&newSlotId) a.slot=newSlotId;
+async function reassignSlot(appId, newSlotId) {
+  if (!newSlotId) return;
+  try {
+    await sbUpdate('applications', appId, { slot: newSlotId });
+    const a = state.applications.find(x => x.id === appId);
+    if (a) a.slot = newSlotId;
+    renderAppsList();
+  } catch(e) { alert('Failed to reassign slot.'); }
 }
 
-function updateSchool(slotId,val){
-  const s=getSlot(slotId);
-  if(s){s.school=val;renderPublic();}
+async function updateSchool(slotId, val) {
+  try {
+    await sbUpdate('slots', slotId, { school: val });
+    const s = getSlot(slotId);
+    if (s) s.school = val;
+  } catch(e) { alert('Failed to update school.'); }
 }
 
-function markPast(slotId){
-  const s=getSlot(slotId);
-  if(s){s.status='past';renderAdmin();}
+async function editSlot(slotId) {
+  const newDate = document.getElementById('edate-' + slotId).value;
+  const newTime = document.getElementById('etime-' + slotId).value;
+  if (!newDate || !newTime) return;
+  try {
+    await sbUpdate('slots', slotId, { date: newDate, time: newTime });
+    const s = getSlot(slotId);
+    if (s) { s.date = newDate; s.time = newTime; }
+    renderAdmin();
+  } catch(e) { alert('Failed to update slot.'); }
 }
 
-function pairApplicant(appId){
-  const a=state.applications.find(x=>x.id===appId);
-  if(!a) return;
-  a.status='paired';
-  const slot=getSlot(a.slot);
-  if(slot){
-    if(!slot.team.includes(appId)) slot.team.push(appId);
-    const apps=getApps(slot.id);
-    const hasGrad=apps.some(x=>x.role==='grad'&&x.status==='paired');
-    const hasUG=apps.some(x=>x.role==='undergrad'&&x.status==='paired');
-    if(hasGrad&&hasUG) slot.status='filled';
+async function markPast(slotId) {
+  try {
+    await sbUpdate('slots', slotId, { status: 'past' });
+    const s = getSlot(slotId);
+    if (s) s.status = 'past';
+    renderAdmin();
+  } catch(e) { alert('Failed to mark slot as past.'); }
+}
+
+async function pairApplicant(appId) {
+  const a = state.applications.find(x => x.id === appId);
+  if (!a) return;
+  try {
+    await sbUpdate('applications', appId, { status: 'paired' });
+    a.status = 'paired';
+    const slot = getSlot(a.slot);
+    if (slot) {
+      const team = [...(slot.team || [])];
+      if (!team.includes(appId)) team.push(appId);
+      const apps = getApps(slot.id);
+      const hasGrad = apps.some(x => x.role === 'grad' && x.status === 'paired');
+      const hasUG = apps.some(x => x.role === 'undergrad' && x.status === 'paired');
+      const newStatus = (hasGrad && hasUG) ? 'filled' : slot.status;
+      await sbUpdate('slots', slot.id, { team, status: newStatus });
+      slot.team = team;
+      slot.status = newStatus;
+    }
+    renderAdmin();
+  } catch(e) { alert('Failed to confirm applicant.'); }
+}
+
+async function addSlot() {
+  const date = document.getElementById('slot-date').value;
+  const time = document.getElementById('slot-time').value || '09:00';
+  ['slot-add-success','slot-add-err'].forEach(id => document.getElementById(id).style.display = 'none');
+  if (!date) { alert('Please select a date.'); return; }
+  document.getElementById('slot-spinner').style.display = 'inline';
+  try {
+    const row = { id: 's' + Date.now(), date, time, status: 'open', school: '', team: [] };
+    await sbInsert('slots', row);
+    state.slots.push(row);
+    document.getElementById('slot-date').value = '';
+    document.getElementById('slot-add-success').style.display = 'block';
+    setTimeout(() => document.getElementById('slot-add-success').style.display = 'none', 3000);
+    renderAdmin();
+  } catch(e) {
+    document.getElementById('slot-add-err').style.display = 'block';
   }
-  renderAdmin();
+  document.getElementById('slot-spinner').style.display = 'none';
 }
 
-function addSlot(){
-  const date=document.getElementById('slot-date').value;
-  const time=document.getElementById('slot-time').value||'09:00';
-  if(!date){alert('Please select a date.');return;}
-  state.slots.push({id:'s'+Date.now(),date,time,status:'open',school:'',team:[]});
-  document.getElementById('slot-date').value='';
-  const succ=document.getElementById('slot-add-success');
-  succ.style.display='block';
-  setTimeout(()=>succ.style.display='none',3000);
-  renderAdmin();
-}
-
-renderPublic();
+initPublic();
 </script>
 </body>
 </html>
