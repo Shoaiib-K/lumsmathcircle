@@ -88,7 +88,6 @@ input:hover,select:hover{border-color:var(--border3)}
 .btn-danger:hover{background:#fecaca}
 .btn-export{background:var(--success-bg);color:var(--success-text);border-color:#86efac}
 .btn-export:hover{background:#bbf7d0}
-.modal-open{overflow:hidden}
 .badge-rejected{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
 .badge-paired{background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe}
 
@@ -363,35 +362,6 @@ input[type="date"]::-webkit-calendar-picker-indicator{opacity:0.5}
   </div>
 </div>
 
-<!-- EDIT APPLICATION MODAL -->
-<div id="edit-modal-backdrop" style="display:none;position:fixed;inset:0;background:rgba(10,31,92,0.45);z-index:999;display:none;align-items:center;justify-content:center;padding:1rem">
-  <div style="background:#fff;border-radius:var(--radius-xl);padding:2rem;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(10,31,92,0.2);position:relative">
-    <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:1.25rem">Edit Application</div>
-    <input type="hidden" id="edit-app-id">
-    <div class="row2">
-      <div><label>Full name</label><input type="text" id="edit-name"></div>
-      <div><label>Email</label><input type="email" id="edit-email"></div>
-    </div>
-    <div class="row2">
-      <div><label>Phone</label><input type="tel" id="edit-phone"></div>
-      <div><label>Role</label>
-        <select id="edit-role">
-          <option value="grad">Graduate</option>
-          <option value="undergrad">Undergraduate</option>
-        </select>
-      </div>
-    </div>
-    <div><label>Major</label><input type="text" id="edit-dept"></div>
-    <div><label>Topic</label><input type="text" id="edit-topic"></div>
-    <div><label>Note</label><textarea id="edit-note" rows="2"></textarea></div>
-    <div style="display:flex;gap:10px;margin-top:1.25rem">
-      <button class="btn btn-primary" onclick="saveEditApplication()">Save Changes</button>
-      <button class="btn" onclick="closeEditModal()">Cancel</button>
-    </div>
-    <div id="edit-success" class="alert alert-success">Changes saved.</div>
-    <div id="edit-err" class="alert alert-danger">Failed to save. Try again.</div>
-  </div>
-</div>
 
 <footer class="footer">
   <strong>LUMS Math Circle</strong> — Outreach Session Manager &bull; Managed by Shoaib &amp; Dr. Imran Anwar
@@ -526,8 +496,6 @@ function renderSlotsList(){
   if(!sorted.length){document.getElementById('slots-list').innerHTML='<div class="empty-state">No slots added yet. Add your first slot above.</div>';return;}
   document.getElementById('slots-list').innerHTML=sorted.map(s=>{
     const apps=getApps(s.id);
-    const grad=apps.find(a=>a.role==='grad'&&a.status==='paired');
-    const ug=apps.find(a=>a.role==='undergrad'&&a.status==='paired');
     const isPast=s.status==='past';
     const barColor=s.status==='open'?'#16a34a':s.status==='filled'?'#1d4ed8':'#94a3b8';
     return`<div class="slot-row">
@@ -549,8 +517,9 @@ function renderSlotsList(){
       </div>
       <div style="min-width:160px">
         <div class="team-tags">
-          ${grad?`<span class="badge badge-grad">${grad.name}</span>`:'<span style="font-size:11px;color:var(--text3)">No grad assigned</span>'}
-          ${ug?`<span class="badge badge-undergrad">${ug.name}</span>`:'<span style="font-size:11px;color:var(--text3)">No undergrad</span>'}
+          ${apps.filter(a=>a.status==='paired').length
+            ? apps.filter(a=>a.status==='paired').map(a=>`<span class="badge badge-${a.role==='grad'?'grad':'undergrad'}">${a.name}</span>`).join('')
+            : '<span style="font-size:11px;color:var(--text3)">No one assigned</span>'}
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:5px">
@@ -620,7 +589,7 @@ function appRowHTML(a,openSlots,isRejected){
     <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end">
       ${a.status==='pending'?`<button class="btn btn-sm btn-primary" onclick="pairApplicant('${a.id}')">Confirm &amp; Pair</button>`:''}
       ${a.status==='pending'?`<button class="btn btn-sm btn-danger" onclick="rejectApplicant('${a.id}')">Reject</button>`:''}
-      ${a.status==='paired'?`<button class="btn btn-sm" onclick="openEditModal('${a.id}')">Edit</button>`:''}
+      ${a.status==='paired'?`<button class="btn btn-sm" style="background:var(--warn-bg);color:var(--warn-text);border-color:#fde68a" onclick="unpairApplicant('${a.id}')">Unconfirm</button>`:''}
       ${isRejected?`<button class="btn btn-sm" onclick="restoreApplicant('${a.id}')">Restore</button>`:''}
     </div>
   </div>`;
@@ -669,9 +638,8 @@ async function pairApplicant(appId){
     if(slot){
       const team=[...(slot.team||[])];if(!team.includes(appId)) team.push(appId);
       const apps=getApps(slot.id);
-      const hasGrad=apps.some(x=>x.role==='grad'&&x.status==='paired');
-      const hasUG=apps.some(x=>x.role==='undergrad'&&x.status==='paired');
-      const newStatus=(hasGrad&&hasUG)?'filled':slot.status;
+      const pairedCount=apps.filter(x=>x.status==='paired').length;
+      const newStatus=pairedCount>=2?'filled':slot.status;
       await sbUpdate('slots',slot.id,{team,status:newStatus});slot.team=team;slot.status=newStatus;
     }
     renderAdmin();
@@ -708,48 +676,23 @@ function toggleRejected(){
   if(showRejected) renderRejectedList();
 }
 
-function openEditModal(appId){
+async function unpairApplicant(appId){
   const a=state.applications.find(x=>x.id===appId);
   if(!a) return;
-  document.getElementById('edit-app-id').value=appId;
-  document.getElementById('edit-name').value=a.name||'';
-  document.getElementById('edit-email').value=a.email||'';
-  document.getElementById('edit-phone').value=a.phone||'';
-  document.getElementById('edit-role').value=a.role||'grad';
-  document.getElementById('edit-dept').value=a.dept||'';
-  document.getElementById('edit-topic').value=a.topic||'';
-  document.getElementById('edit-note').value=a.note||'';
-  ['edit-success','edit-err'].forEach(id=>document.getElementById(id).style.display='none');
-  const backdrop=document.getElementById('edit-modal-backdrop');
-  backdrop.style.display='flex';
-  document.body.classList.add('modal-open');
-}
-
-function closeEditModal(){
-  document.getElementById('edit-modal-backdrop').style.display='none';
-  document.body.classList.remove('modal-open');
-}
-
-async function saveEditApplication(){
-  const appId=document.getElementById('edit-app-id').value;
-  const a=state.applications.find(x=>x.id===appId);
-  if(!a) return;
-  ['edit-success','edit-err'].forEach(id=>document.getElementById(id).style.display='none');
-  const patch={
-    name:document.getElementById('edit-name').value.trim(),
-    email:document.getElementById('edit-email').value.trim(),
-    phone:document.getElementById('edit-phone').value.trim(),
-    role:document.getElementById('edit-role').value,
-    dept:document.getElementById('edit-dept').value.trim(),
-    topic:document.getElementById('edit-topic').value.trim(),
-    note:document.getElementById('edit-note').value.trim()
-  };
+  if(!confirm(`Move ${a.name} back to pending? They will be unconfirmed from their slot.`)) return;
   try{
-    await sbUpdate('applications',appId,patch);
-    Object.assign(a,patch);
-    document.getElementById('edit-success').style.display='block';
-    setTimeout(()=>{closeEditModal();renderAdmin();},1200);
-  }catch(e){document.getElementById('edit-err').style.display='block';}
+    await sbUpdate('applications',appId,{status:'pending',paired_at:null});
+    a.status='pending'; a.paired_at=null;
+    const slot=getSlot(a.slot);
+    if(slot){
+      const team=(slot.team||[]).filter(id=>id!==appId);
+      const remainingPaired=getApps(slot.id).filter(x=>x.id!==appId&&x.status==='paired').length;
+      const newStatus=remainingPaired>=2?'filled':'open';
+      await sbUpdate('slots',slot.id,{team,status:newStatus});
+      slot.team=team; slot.status=newStatus;
+    }
+    renderAdmin();
+  }catch(e){alert('Failed to unconfirm applicant.');}
 }
 
 async function deleteSlot(slotId){
