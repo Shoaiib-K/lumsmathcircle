@@ -5,398 +5,100 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LUMS Math Circle — Outreach Manager</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg: #ffffff;
-    --bg-secondary: #f5f5f4;
-    --bg-tertiary: #f0ede8;
-    --text: #1a1a18;
-    --text-secondary: #6b6b67;
-    --text-muted: #9a9a95;
-    --border: rgba(0,0,0,0.12);
-    --border-strong: rgba(0,0,0,0.22);
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    --info-bg: #e6f1fb;
-    --info-text: #0c447c;
-    --success-bg: #eaf3de;
-    --success-text: #27500a;
-    --warning-bg: #faeeda;
-    --warning-text: #633806;
-    --danger-bg: #fcebeb;
-    --danger-text: #791f1f;
-    --purple-bg: #eeedfe;
-    --purple-text: #3c3489;
-    --teal-bg: #e1f5ee;
-    --teal-text: #085041;
-    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #1e1e1c;
-      --bg-secondary: #2a2a28;
-      --bg-tertiary: #242422;
-      --text: #f0ede8;
-      --text-secondary: #a0a09a;
-      --text-muted: #6b6b67;
-      --border: rgba(255,255,255,0.1);
-      --border-strong: rgba(255,255,255,0.2);
-      --info-bg: #0c2f52;
-      --info-text: #85b7eb;
-      --success-bg: #172d08;
-      --success-text: #97c459;
-      --warning-bg: #3a2005;
-      --warning-text: #fac775;
-      --danger-bg: #2e1010;
-      --danger-text: #f09595;
-      --purple-bg: #1e1a4a;
-      --purple-text: #afa9ec;
-      --teal-bg: #043028;
-      --teal-text: #5dcaa5;
-    }
-  }
-
-  body {
-    font-family: var(--font);
-    background: var(--bg-tertiary);
-    color: var(--text);
-    min-height: 100vh;
-    font-size: 15px;
-    line-height: 1.6;
-  }
-
-  .topbar {
-    background: var(--bg);
-    border-bottom: 0.5px solid var(--border);
-    padding: 0 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    min-height: 54px;
-    flex-wrap: wrap;
-  }
-
-  .logo {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
-    white-space: nowrap;
-    padding: 14px 0;
-    letter-spacing: 0.01em;
-  }
-
-  .logo span {
-    color: var(--text-secondary);
-    font-weight: 400;
-  }
-
-  .nav {
-    display: flex;
-    gap: 2px;
-    flex: 1;
-    flex-wrap: wrap;
-  }
-
-  .nav-btn {
-    padding: 6px 14px;
-    border: none;
-    background: transparent;
-    color: var(--text-secondary);
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    border-radius: var(--radius-md);
-    transition: background 0.15s, color 0.15s;
-    font-family: var(--font);
-  }
-
-  .nav-btn:hover { background: var(--bg-secondary); color: var(--text); }
-  .nav-btn.active { background: var(--bg-secondary); color: var(--text); }
-
-  .container {
-    max-width: 880px;
-    margin: 0 auto;
-    padding: 2rem 1.25rem;
-  }
-
-  .page { display: none; }
-  .page.active { display: block; }
-
-  /* Cards */
-  .card {
-    background: var(--bg);
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 14px;
-  }
-
-  .section-title {
-    font-size: 17px;
-    font-weight: 500;
-    margin-bottom: 1rem;
-    color: var(--text);
-  }
-
-  /* Metrics */
-  .metrics {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 10px;
-    margin-bottom: 1.75rem;
-  }
-
-  .metric {
-    background: var(--bg);
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 1rem 1.1rem;
-    text-align: center;
-  }
-
-  .metric-num {
-    font-size: 28px;
-    font-weight: 500;
-    line-height: 1.1;
-    color: var(--text);
-  }
-
-  .metric-label {
-    font-size: 11px;
-    color: var(--text-secondary);
-    margin-top: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-
-  /* Badges */
-  .badge {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: var(--radius-md);
-    font-size: 11px;
-    font-weight: 500;
-    white-space: nowrap;
-  }
-
-  .badge-open { background: var(--success-bg); color: var(--success-text); }
-  .badge-filled { background: var(--info-bg); color: var(--info-text); }
-  .badge-past { background: var(--bg-secondary); color: var(--text-secondary); }
-  .badge-pending { background: var(--warning-bg); color: var(--warning-text); }
-  .badge-grad { background: var(--purple-bg); color: var(--purple-text); }
-  .badge-undergrad { background: var(--teal-bg); color: var(--teal-text); }
-
-  /* Form elements */
-  label {
-    font-size: 12px;
-    color: var(--text-secondary);
-    display: block;
-    margin-bottom: 5px;
-    margin-top: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-
-  label:first-of-type { margin-top: 0; }
-
-  input, select, textarea {
-    width: 100%;
-    padding: 9px 11px;
-    font-size: 14px;
-    border: 0.5px solid var(--border-strong);
-    border-radius: var(--radius-md);
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font);
-    transition: border-color 0.15s;
-    appearance: auto;
-  }
-
-  input:focus, select:focus, textarea:focus {
-    outline: none;
-    border-color: var(--info-text);
-    box-shadow: 0 0 0 2px var(--info-bg);
-  }
-
-  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  @media (max-width: 540px) { .row2 { grid-template-columns: 1fr; } }
-
-  /* Buttons */
-  .btn {
-    padding: 8px 18px;
-    border: 0.5px solid var(--border-strong);
-    border-radius: var(--radius-md);
-    background: transparent;
-    color: var(--text);
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    font-family: var(--font);
-    transition: background 0.15s;
-  }
-
-  .btn:hover { background: var(--bg-secondary); }
-  .btn:active { transform: scale(0.98); }
-
-  .btn-primary {
-    background: var(--info-bg);
-    color: var(--info-text);
-    border-color: transparent;
-  }
-
-  .btn-primary:hover { opacity: 0.88; background: var(--info-bg); }
-  .btn-sm { padding: 5px 11px; font-size: 12px; }
-  .btn-danger { background: var(--danger-bg); color: var(--danger-text); border-color: transparent; }
-
-  /* Slot rows */
-  .slot-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 11px 0;
-    border-bottom: 0.5px solid var(--border);
-    flex-wrap: wrap;
-  }
-
-  .slot-row:last-child { border-bottom: none; }
-
-  .slot-date { font-weight: 500; min-width: 140px; font-size: 13px; }
-  .slot-time { font-size: 12px; color: var(--text-secondary); }
-
-  /* Applicant rows */
-  .app-row {
-    padding: 12px 0;
-    border-bottom: 0.5px solid var(--border);
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .app-row:last-child { border-bottom: none; }
-  .ainfo { flex: 1; min-width: 200px; }
-  .aname { font-weight: 500; font-size: 14px; }
-  .ameta { font-size: 12px; color: var(--text-secondary); margin-top: 2px; line-height: 1.5; }
-
-  .ml-auto { margin-left: auto; }
-
-  /* Public page */
-  .public-header {
-    text-align: center;
-    padding: 2rem 1rem 1.5rem;
-  }
-
-  .public-header .eyebrow {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text-secondary);
-    margin-bottom: 8px;
-    font-weight: 500;
-  }
-
-  .public-header h1 {
-    font-size: 26px;
-    font-weight: 500;
-    margin-bottom: 8px;
-  }
-
-  .public-header p {
-    font-size: 14px;
-    color: var(--text-secondary);
-    max-width: 480px;
-    margin: 0 auto;
-  }
-
-  .slot-card-public {
-    background: var(--bg);
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 1rem 1.25rem;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-
-  .date-block {
-    text-align: center;
-    min-width: 44px;
-  }
-
-  .date-block .day { font-size: 22px; font-weight: 500; line-height: 1; }
-  .date-block .month { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; margin-top: 2px; }
-
-  .slot-info { flex: 1; min-width: 160px; }
-  .slot-title { font-size: 14px; font-weight: 500; }
-  .slot-sub { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
-
-  /* Admin gate */
-  .gate-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 60vh;
-  }
-
-  .gate-card {
-    background: var(--bg);
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 2rem;
-    width: 100%;
-    max-width: 360px;
-    text-align: center;
-  }
-
-  .gate-card h2 { font-size: 18px; font-weight: 500; margin-bottom: 6px; }
-  .gate-card p { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; }
-  .gate-card input { text-align: center; margin-bottom: 12px; }
-
-  /* Alerts */
-  .alert {
-    padding: 10px 14px;
-    border-radius: var(--radius-md);
-    font-size: 13px;
-    margin-top: 12px;
-    display: none;
-  }
-
-  .alert-success { background: var(--success-bg); color: var(--success-text); }
-  .alert-warning { background: var(--warning-bg); color: var(--warning-text); }
-  .alert-danger { background: var(--danger-bg); color: var(--danger-text); }
-
-  .divider { border: none; border-top: 0.5px solid var(--border); margin: 1.75rem 0; }
-
-  .empty-state {
-    text-align: center;
-    padding: 2.5rem 1rem;
-    color: var(--text-muted);
-    font-size: 14px;
-  }
-
-  .how-it-works {
-    font-size: 13px;
-    color: var(--text-secondary);
-    line-height: 2;
-  }
-
-  .team-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
-
-  .footer {
-    text-align: center;
-    padding: 2rem;
-    font-size: 12px;
-    color: var(--text-muted);
-    border-top: 0.5px solid var(--border);
-    margin-top: 2rem;
-  }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#0d1117;--bg2:#161b22;--bg3:#1c2230;--bg4:#212836;
+--text:#e6edf3;--text2:#8b949e;--text3:#484f58;
+--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+--blue50:#e6f1fb;--blue100:#b5d4f4;--blue200:#85b7eb;--blue400:#378add;--blue600:#185fa5;--blue700:#0f4a82;--blue800:#0c447c;--blue900:#042c53;
+--info-bg:rgba(55,138,221,0.12);--info-text:#85b7eb;--info-border:rgba(55,138,221,0.25);
+--success-bg:rgba(99,153,34,0.12);--success-text:#97c459;
+--warn-bg:rgba(239,159,39,0.12);--warn-text:#fac775;
+--danger-bg:rgba(226,75,74,0.12);--danger-text:#f09595;
+--purple-bg:rgba(127,119,221,0.12);--purple-text:#afa9ec;
+--teal-bg:rgba(29,158,117,0.12);--teal-text:#5dcaa5;
+--radius:8px;--radius-lg:12px;
+--font:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
+.topbar{background:var(--bg2);border-bottom:0.5px solid var(--border2);padding:0 1.5rem;display:flex;align-items:center;gap:1rem;position:sticky;top:0;z-index:100;min-height:52px;flex-wrap:wrap}
+.logo{font-size:13px;font-weight:500;white-space:nowrap;padding:14px 0;letter-spacing:0.01em;color:var(--blue200)}
+.logo span{color:var(--text2);font-weight:400}
+.nav{display:flex;gap:2px;flex:1;flex-wrap:wrap}
+.nav-btn{padding:5px 13px;border:none;background:transparent;color:var(--text2);cursor:pointer;font-size:13px;font-weight:500;border-radius:var(--radius);transition:background 0.15s,color 0.15s;font-family:var(--font)}
+.nav-btn:hover{background:var(--bg3);color:var(--text)}
+.nav-btn.active{background:var(--info-bg);color:var(--info-text);border:0.5px solid var(--info-border)}
+.container{max-width:860px;margin:0 auto;padding:1.75rem 1.25rem}
+.page{display:none}.page.active{display:block}
+.card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:12px}
+.section-title{font-size:15px;font-weight:500;margin-bottom:1rem;color:var(--text)}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:1.5rem}
+.metric{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:.9rem 1rem;text-align:center}
+.metric-num{font-size:26px;font-weight:500;line-height:1.1;color:var(--blue200)}
+.metric-label{font-size:10px;color:var(--text2);margin-top:3px;text-transform:uppercase;letter-spacing:0.05em}
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:var(--radius);font-size:11px;font-weight:500;white-space:nowrap;gap:4px}
+.badge-open{background:var(--success-bg);color:var(--success-text)}
+.badge-filled{background:var(--info-bg);color:var(--info-text)}
+.badge-past{background:rgba(255,255,255,0.05);color:var(--text2)}
+.badge-pending{background:var(--warn-bg);color:var(--warn-text)}
+.badge-grad{background:var(--purple-bg);color:var(--purple-text)}
+.badge-undergrad{background:var(--teal-bg);color:var(--teal-text)}
+label{font-size:11px;color:var(--text2);display:block;margin-bottom:4px;margin-top:12px;text-transform:uppercase;letter-spacing:0.05em}
+label:first-of-type{margin-top:0}
+input,select,textarea{width:100%;padding:8px 10px;font-size:13px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg3);color:var(--text);font-family:var(--font);transition:border-color 0.15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue400);box-shadow:0 0 0 2px rgba(55,138,221,0.15)}
+select option{background:var(--bg3)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.row2{grid-template-columns:1fr}}
+.btn{padding:7px 16px;border:0.5px solid var(--border2);border-radius:var(--radius);background:transparent;color:var(--text);cursor:pointer;font-size:13px;font-weight:500;font-family:var(--font);transition:background 0.15s,border-color 0.15s}
+.btn:hover{background:var(--bg3);border-color:var(--border2)}
+.btn:active{transform:scale(0.98)}
+.btn-primary{background:var(--info-bg);color:var(--info-text);border-color:var(--info-border)}
+.btn-primary:hover{background:rgba(55,138,221,0.18)}
+.btn-sm{padding:4px 10px;font-size:11px}
+.btn-danger{background:var(--danger-bg);color:var(--danger-text);border-color:transparent}
+.slot-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border);flex-wrap:wrap}
+.slot-row:last-child{border-bottom:none}
+.slot-date{font-weight:500;min-width:130px;font-size:13px;color:var(--text)}
+.slot-time{font-size:11px;color:var(--text2)}
+.app-row{padding:12px 0;border-bottom:0.5px solid var(--border);display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.app-row:last-child{border-bottom:none}
+.ainfo{flex:1;min-width:180px}
+.aname{font-weight:500;font-size:13px;color:var(--text)}
+.ameta{font-size:11px;color:var(--text2);margin-top:2px;line-height:1.6}
+.ml-auto{margin-left:auto}
+.public-header{text-align:center;padding:2rem 1rem 1.5rem}
+.public-header .eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:var(--text2);margin-bottom:8px;font-weight:500}
+.public-header h1{font-size:22px;font-weight:500;margin-bottom:8px;color:var(--text)}
+.public-header p{font-size:13px;color:var(--text2);max-width:460px;margin:0 auto}
+.section-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--text2);margin:1.25rem 0 8px;padding-bottom:6px;border-bottom:0.5px solid var(--border)}
+.slot-card-public{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:.9rem 1.25rem;margin-bottom:8px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;transition:border-color 0.15s}
+.slot-card-public:hover{border-color:var(--border2)}
+.slot-card-public.past-card{opacity:0.55}
+.date-block{text-align:center;min-width:40px}
+.date-block .day{font-size:20px;font-weight:500;line-height:1;color:var(--blue200)}
+.date-block .month{font-size:10px;color:var(--text2);text-transform:uppercase;margin-top:2px}
+.slot-info{flex:1;min-width:140px}
+.slot-title{font-size:13px;font-weight:500;color:var(--text)}
+.slot-sub{font-size:11px;color:var(--text2);margin-top:3px}
+.gate-wrap{display:flex;align-items:center;justify-content:center;min-height:55vh}
+.gate-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:2rem;width:100%;max-width:340px;text-align:center}
+.gate-card h2{font-size:17px;font-weight:500;margin-bottom:5px;color:var(--text)}
+.gate-card p{font-size:12px;color:var(--text2);margin-bottom:14px}
+.gate-card input{text-align:center;margin-bottom:10px}
+.alert{padding:9px 13px;border-radius:var(--radius);font-size:12px;margin-top:10px;display:none}
+.alert-success{background:var(--success-bg);color:var(--success-text)}
+.alert-warning{background:var(--warn-bg);color:var(--warn-text)}
+.alert-danger{background:var(--danger-bg);color:var(--danger-text)}
+.divider{border:none;border-top:0.5px solid var(--border);margin:1.5rem 0}
+.empty-state{text-align:center;padding:2rem 1rem;color:var(--text3);font-size:13px}
+.how-it-works{font-size:12px;color:var(--text2);line-height:2.1}
+.team-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.footer{text-align:center;padding:1.5rem;font-size:11px;color:var(--text3);border-top:0.5px solid var(--border);margin-top:2rem}
+.accent-line{width:2px;height:36px;background:var(--blue600);border-radius:2px;flex-shrink:0}
+.slot-actions{display:flex;flex-direction:column;gap:5px;align-items:flex-end}
+.edit-row{display:flex;gap:6px;align-items:center;margin-top:5px}
+input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(0.7)}
 </style>
 </head>
 <body>
@@ -405,71 +107,59 @@
   <div class="logo">LUMS Math Circle <span>/ Outreach</span></div>
   <nav class="nav">
     <button class="nav-btn active" onclick="showPage('public')">Upcoming Sessions</button>
-    <button class="nav-btn" onclick="showPage('apply')">Apply for a Session</button>
+    <button class="nav-btn" onclick="showPage('apply')">Apply for a Slot</button>
     <button class="nav-btn" onclick="showPage('admin')">Admin</button>
   </nav>
 </div>
 
-<!-- PUBLIC PAGE -->
 <div class="page active" id="page-public">
   <div class="container">
     <div class="public-header">
       <div class="eyebrow">LUMS Math Circle — Lahore Outreach</div>
-      <h1>Upcoming School Sessions</h1>
+      <h1>School Sessions</h1>
       <p>Student-led mathematics sessions at schools across Lahore, organised by LUMS Math Circle.</p>
     </div>
+    <div id="public-upcoming-label" class="section-label">Upcoming &amp; confirmed</div>
     <div id="public-slots"></div>
-    <div id="public-empty" class="empty-state" style="display:none">No upcoming sessions scheduled yet. Check back soon.</div>
+    <div id="public-empty" class="empty-state" style="display:none">No upcoming sessions yet.</div>
+    <div id="public-past-label" class="section-label" style="margin-top:1.5rem">Past sessions</div>
+    <div id="public-past"></div>
+    <div id="public-past-empty" class="empty-state" style="display:none">No past sessions recorded.</div>
   </div>
 </div>
 
-<!-- APPLY PAGE -->
 <div class="page" id="page-apply">
   <div class="container">
-    <div class="section-title">Apply for a Session Slot</div>
-
+    <div class="section-title">Apply for a session slot</div>
     <div class="card">
       <div class="row2">
-        <div>
-          <label>Full name *</label>
-          <input type="text" id="app-name" placeholder="e.g. Ali Hassan">
-        </div>
-        <div>
-          <label>LUMS email *</label>
-          <input type="email" id="app-email" placeholder="xyz@lums.edu.pk">
-        </div>
+        <div><label>Full name *</label><input type="text" id="app-name" placeholder="e.g. Ali Hassan"></div>
+        <div><label>LUMS email *</label><input type="email" id="app-email" placeholder="xyz@lums.edu.pk"></div>
       </div>
       <div class="row2">
-        <div>
-          <label>Your role *</label>
+        <div><label>Your role *</label>
           <select id="app-role">
             <option value="">Select role</option>
             <option value="grad">Graduate student</option>
             <option value="undergrad">Undergraduate student</option>
           </select>
         </div>
-        <div>
-          <label>Department / Program</label>
-          <input type="text" id="app-dept" placeholder="e.g. BSc Mathematics, Year 2">
-        </div>
+        <div><label>Department / Program</label><input type="text" id="app-dept" placeholder="e.g. BSc Mathematics, Year 2"></div>
       </div>
       <label>Preferred session slot *</label>
-      <select id="app-slot">
-        <option value="">Select an available slot</option>
-      </select>
+      <select id="app-slot"><option value="">Select an available slot</option></select>
       <label>Topic you'd like to cover (optional)</label>
       <input type="text" id="app-topic" placeholder="e.g. Number theory, Combinatorics, Geometry">
       <label>Additional note (optional)</label>
       <textarea id="app-note" rows="2" placeholder="Any extra information for the admin team..."></textarea>
-      <div style="margin-top:16px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
         <button class="btn btn-primary" onclick="submitApplication()">Submit application</button>
       </div>
-      <div id="apply-success" class="alert alert-success">Your application has been submitted. We will review and confirm your slot soon.</div>
+      <div id="apply-success" class="alert alert-success">Application submitted. We will review and confirm your slot soon.</div>
       <div id="apply-err" class="alert alert-warning">Please fill in all required fields marked with *.</div>
     </div>
-
     <div class="card">
-      <div style="font-size:13px; font-weight:500; margin-bottom:8px;">How this works</div>
+      <div style="font-size:12px;font-weight:500;margin-bottom:8px;color:var(--text2)">How this works</div>
       <div class="how-it-works">
         1. Fill the form above and select an open session slot.<br>
         2. The admin team reviews all applications for that slot.<br>
@@ -481,10 +171,8 @@
   </div>
 </div>
 
-<!-- ADMIN PAGE -->
 <div class="page" id="page-admin">
   <div class="container">
-
     <div id="admin-gate">
       <div class="gate-wrap">
         <div class="gate-card">
@@ -492,38 +180,27 @@
           <p>Enter the admin password to manage sessions and applications.</p>
           <input type="password" id="admin-pass" placeholder="Password" onkeydown="if(event.key==='Enter') checkAdmin()">
           <button class="btn btn-primary" style="width:100%" onclick="checkAdmin()">Sign in</button>
-          <div id="admin-err" class="alert alert-danger">Incorrect password. Please try again.</div>
+          <div id="admin-err" class="alert alert-danger">Incorrect password.</div>
         </div>
       </div>
     </div>
 
     <div id="admin-panel" style="display:none">
-
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px">
         <div class="section-title" style="margin-bottom:0">Admin Dashboard</div>
         <button class="btn btn-sm" onclick="signOut()">Sign out</button>
       </div>
-
       <div class="metrics" id="admin-metrics"></div>
 
       <div class="section-title">Session slots</div>
-
       <div class="card">
-        <div style="font-size:13px; font-weight:500; margin-bottom:12px;">Add new slot</div>
+        <div style="font-size:12px;font-weight:500;margin-bottom:10px;color:var(--text2)">Add new slot</div>
         <div class="row2">
-          <div>
-            <label>Date</label>
-            <input type="date" id="slot-date">
-          </div>
-          <div>
-            <label>Time</label>
-            <input type="time" id="slot-time" value="09:00">
-          </div>
+          <div><label>Date</label><input type="date" id="slot-date"></div>
+          <div><label>Time</label><input type="time" id="slot-time" value="09:00"></div>
         </div>
-        <div style="margin-top:12px;">
-          <button class="btn btn-primary btn-sm" onclick="addSlot()">Add slot</button>
-        </div>
-        <div id="slot-add-success" class="alert alert-success">Slot added successfully.</div>
+        <div style="margin-top:10px"><button class="btn btn-primary btn-sm" onclick="addSlot()">Add slot</button></div>
+        <div id="slot-add-success" class="alert alert-success">Slot added.</div>
       </div>
 
       <div class="card" id="slots-card">
@@ -532,243 +209,271 @@
 
       <hr class="divider">
 
-      <div class="section-title">Applications</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:8px">
+        <div class="section-title" style="margin-bottom:0">Applications</div>
+        <select id="filter-slot" style="width:auto;font-size:12px;padding:5px 8px" onchange="renderAppsList()">
+          <option value="">All slots</option>
+        </select>
+      </div>
       <div class="card">
         <div id="applications-list"></div>
       </div>
-
     </div>
   </div>
 </div>
 
-<footer class="footer">
-  LUMS Math Circle — Outreach Session Manager &bull; Managed by Shoaib &amp; Dr. Imran Anwar
-</footer>
+<footer class="footer">LUMS Math Circle — Outreach Session Manager &bull; Managed by Shoaib &amp; Dr. Imran Anwar</footer>
 
 <script>
 const ADMIN_PASSWORD = "lumsmathcircle2025";
-
 let state = {
   slots: [
-    { id: 's1', date: '2025-05-12', time: '09:00', status: 'open', school: '', team: [] },
-    { id: 's2', date: '2025-05-26', time: '09:00', status: 'open', school: '', team: [] },
-    { id: 's3', date: '2025-06-09', time: '09:00', status: 'filled', school: 'Lahore Grammar School, DHA', team: ['a1','a2'] },
-    { id: 's4', date: '2025-03-17', time: '09:00', status: 'past', school: 'Beaconhouse School System', team: ['a3','a4'] },
+    {id:'s1',date:'2025-05-12',time:'09:00',status:'open',school:'',team:[]},
+    {id:'s2',date:'2025-05-26',time:'09:00',status:'open',school:'',team:[]},
+    {id:'s3',date:'2025-06-09',time:'09:00',status:'filled',school:'Lahore Grammar School, DHA',team:['a1','a2']},
+    {id:'s4',date:'2025-03-17',time:'09:00',status:'past',school:'Beaconhouse School System',team:['a3','a4']},
   ],
   applications: [
-    { id: 'a1', name: 'Sara Ahmed', email: 'sara@lums.edu.pk', role: 'grad', dept: 'PhD Mathematics', slot: 's3', topic: 'Graph theory', note: '', status: 'paired' },
-    { id: 'a2', name: 'Bilal Khan', email: 'bilal@lums.edu.pk', role: 'undergrad', dept: 'BSc Mathematics Yr3', slot: 's3', topic: 'Graph theory', note: '', status: 'paired' },
-    { id: 'a3', name: 'Nadia Malik', email: 'nadia@lums.edu.pk', role: 'grad', dept: 'MSc Mathematics', slot: 's4', topic: 'Combinatorics', note: '', status: 'paired' },
-    { id: 'a4', name: 'Hamza Raza', email: 'hamza@lums.edu.pk', role: 'undergrad', dept: 'BSc CS Yr2', slot: 's4', topic: '', note: '', status: 'paired' },
-    { id: 'a5', name: 'Ayesha Farooq', email: 'ayesha@lums.edu.pk', role: 'grad', dept: 'PhD Mathematics', slot: 's1', topic: 'Number theory', note: '', status: 'pending' },
-    { id: 'a6', name: 'Zain Ul Abidin', email: 'zain@lums.edu.pk', role: 'undergrad', dept: 'BSc Mathematics Yr2', slot: 's1', topic: '', note: '', status: 'pending' },
-    { id: 'a7', name: 'Mariam Tariq', email: 'mariam@lums.edu.pk', role: 'grad', dept: 'MSc Applied Mathematics', slot: 's2', topic: 'Geometry', note: '', status: 'pending' },
+    {id:'a1',name:'Sara Ahmed',email:'sara@lums.edu.pk',role:'grad',dept:'PhD Mathematics',slot:'s3',topic:'Graph theory',note:'',status:'paired'},
+    {id:'a2',name:'Bilal Khan',email:'bilal@lums.edu.pk',role:'undergrad',dept:'BSc Mathematics Yr3',slot:'s3',topic:'Graph theory',note:'',status:'paired'},
+    {id:'a3',name:'Nadia Malik',email:'nadia@lums.edu.pk',role:'grad',dept:'MSc Mathematics',slot:'s4',topic:'Combinatorics',note:'',status:'paired'},
+    {id:'a4',name:'Hamza Raza',email:'hamza@lums.edu.pk',role:'undergrad',dept:'BSc CS Yr2',slot:'s4',topic:'',note:'',status:'paired'},
+    {id:'a5',name:'Ayesha Farooq',email:'ayesha@lums.edu.pk',role:'grad',dept:'PhD Mathematics',slot:'s1',topic:'Number theory',note:'',status:'pending'},
+    {id:'a6',name:'Zain Ul Abidin',email:'zain@lums.edu.pk',role:'undergrad',dept:'BSc Mathematics Yr2',slot:'s1',topic:'',note:'',status:'pending'},
+    {id:'a7',name:'Mariam Tariq',email:'mariam@lums.edu.pk',role:'grad',dept:'MSc Applied Mathematics',slot:'s2',topic:'Geometry',note:'',status:'pending'},
   ]
 };
 
-function fmt(d) {
-  const dt = new Date(d + 'T00:00:00');
-  return dt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' });
-}
-function fmtShort(d) {
-  const dt = new Date(d + 'T00:00:00');
-  return { day: dt.getDate(), month: dt.toLocaleDateString('en-GB', { month: 'short' }) };
-}
-function fmtTime(t) {
-  const [h, m] = t.split(':');
-  const hh = parseInt(h);
-  return (hh > 12 ? hh - 12 : hh === 0 ? 12 : hh) + ':' + (m || '00') + ' ' + (hh >= 12 ? 'PM' : 'AM');
-}
-function getSlot(id) { return state.slots.find(s => s.id === id); }
-function getApps(slotId) { return state.applications.filter(a => a.slot === slotId); }
+function fmt(d){const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long',year:'numeric'})}
+function fmtShort(d){const dt=new Date(d+'T00:00:00');return{day:dt.getDate(),month:dt.toLocaleDateString('en-GB',{month:'short'})}}
+function fmtTime(t){const[h,m]=t.split(':');const hh=parseInt(h);return(hh>12?hh-12:hh===0?12:hh)+':'+(m||'00')+' '+(hh>=12?'PM':'AM')}
+function getSlot(id){return state.slots.find(s=>s.id===id)}
+function getApps(slotId){return state.applications.filter(a=>a.slot===slotId)}
 
-function showPage(p) {
-  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(x => x.classList.remove('active'));
-  document.getElementById('page-' + p).classList.add('active');
-  const map = { public: 0, apply: 1, admin: 2 };
+function showPage(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  const map={public:0,apply:1,admin:2};
   document.querySelectorAll('.nav-btn')[map[p]].classList.add('active');
-  if (p === 'public') renderPublic();
-  if (p === 'apply') renderApplySlots();
-  if (p === 'admin' && document.getElementById('admin-panel').style.display !== 'none') renderAdmin();
+  if(p==='public') renderPublic();
+  if(p==='apply') renderApplySlots();
+  if(p==='admin'&&document.getElementById('admin-panel').style.display!=='none') renderAdmin();
 }
 
-function renderPublic() {
-  const upcoming = state.slots.filter(s => s.status !== 'past').sort((a, b) => a.date.localeCompare(b.date));
-  const el = document.getElementById('public-slots');
-  const em = document.getElementById('public-empty');
-  if (!upcoming.length) { el.innerHTML = ''; em.style.display = 'block'; return; }
-  em.style.display = 'none';
-  el.innerHTML = upcoming.map(s => {
-    const { day, month } = fmtShort(s.date);
-    const apps = getApps(s.id);
-    const team = apps.filter(a => a.status === 'paired').map(a => a.name).join(' & ');
-    return `<div class="slot-card-public">
-      <div class="date-block">
-        <div class="day">${day}</div>
-        <div class="month">${month}</div>
-      </div>
-      <div class="slot-info">
-        <div class="slot-title">${fmt(s.date)}</div>
-        <div class="slot-sub">${fmtTime(s.time)} &bull; ${s.school || 'School to be confirmed'} &bull; ${team || 'Team being assembled'}</div>
-      </div>
-      <span class="badge ${s.status === 'open' ? 'badge-open' : 'badge-filled'}">${s.status === 'open' ? 'Open' : 'Confirmed'}</span>
-    </div>`;
-  }).join('');
+function renderPublic(){
+  const upcoming=state.slots.filter(s=>s.status!=='past').sort((a,b)=>a.date.localeCompare(b.date));
+  const past=state.slots.filter(s=>s.status==='past').sort((a,b)=>b.date.localeCompare(a.date));
+  const el=document.getElementById('public-slots');
+  const em=document.getElementById('public-empty');
+  const pel=document.getElementById('public-past');
+  const pem=document.getElementById('public-past-empty');
+
+  if(!upcoming.length){el.innerHTML='';em.style.display='block';}
+  else{em.style.display='none';el.innerHTML=upcoming.map(s=>slotCardHTML(s,false)).join('');}
+
+  if(!past.length){pel.innerHTML='';pem.style.display='block';}
+  else{pem.style.display='none';pel.innerHTML=past.map(s=>slotCardHTML(s,true)).join('');}
 }
 
-function renderApplySlots() {
-  const open = state.slots.filter(s => s.status === 'open').sort((a, b) => a.date.localeCompare(b.date));
-  const sel = document.getElementById('app-slot');
-  sel.innerHTML = '<option value="">Select an available slot</option>' +
-    open.map(s => `<option value="${s.id}">${fmt(s.date)} at ${fmtTime(s.time)}</option>`).join('');
+function slotCardHTML(s,isPast){
+  const{day,month}=fmtShort(s.date);
+  const apps=getApps(s.id);
+  const team=apps.filter(a=>a.status==='paired').map(a=>a.name).join(' & ');
+  const badgeCls=s.status==='open'?'badge-open':s.status==='filled'?'badge-filled':'badge-past';
+  const badgeLabel=s.status==='open'?'Open':s.status==='filled'?'Confirmed':'Past';
+  return`<div class="slot-card-public${isPast?' past-card':''}">
+    <div class="date-block"><div class="day">${day}</div><div class="month">${month}</div></div>
+    <div class="slot-info">
+      <div class="slot-title">${fmt(s.date)}</div>
+      <div class="slot-sub">${fmtTime(s.time)} &bull; ${s.school||'School to be confirmed'} &bull; ${team||'Team being assembled'}</div>
+    </div>
+    <span class="badge ${badgeCls}">${badgeLabel}</span>
+  </div>`;
 }
 
-function submitApplication() {
-  const name = document.getElementById('app-name').value.trim();
-  const email = document.getElementById('app-email').value.trim();
-  const role = document.getElementById('app-role').value;
-  const slot = document.getElementById('app-slot').value;
-  const err = document.getElementById('apply-err');
-  const succ = document.getElementById('apply-success');
-  err.style.display = 'none';
-  succ.style.display = 'none';
-  if (!name || !email || !role || !slot) { err.style.display = 'block'; return; }
-  state.applications.push({
-    id: 'a' + Date.now(), name, email, role,
-    dept: document.getElementById('app-dept').value,
-    slot, topic: document.getElementById('app-topic').value,
-    note: document.getElementById('app-note').value, status: 'pending'
-  });
-  succ.style.display = 'block';
-  ['app-name','app-email','app-dept','app-topic','app-note'].forEach(f => document.getElementById(f).value = '');
-  document.getElementById('app-role').value = '';
-  document.getElementById('app-slot').value = '';
-  setTimeout(() => succ.style.display = 'none', 5000);
+function renderApplySlots(){
+  const open=state.slots.filter(s=>s.status==='open').sort((a,b)=>a.date.localeCompare(b.date));
+  const sel=document.getElementById('app-slot');
+  sel.innerHTML='<option value="">Select an available slot</option>'+open.map(s=>`<option value="${s.id}">${fmt(s.date)} at ${fmtTime(s.time)}</option>`).join('');
 }
 
-function checkAdmin() {
-  document.getElementById('admin-err').style.display = 'none';
-  if (document.getElementById('admin-pass').value === ADMIN_PASSWORD) {
-    document.getElementById('admin-gate').style.display = 'none';
-    document.getElementById('admin-panel').style.display = 'block';
+function submitApplication(){
+  const name=document.getElementById('app-name').value.trim();
+  const email=document.getElementById('app-email').value.trim();
+  const role=document.getElementById('app-role').value;
+  const slot=document.getElementById('app-slot').value;
+  const err=document.getElementById('apply-err');
+  const succ=document.getElementById('apply-success');
+  err.style.display='none';succ.style.display='none';
+  if(!name||!email||!role||!slot){err.style.display='block';return;}
+  state.applications.push({id:'a'+Date.now(),name,email,role,dept:document.getElementById('app-dept').value,slot,topic:document.getElementById('app-topic').value,note:document.getElementById('app-note').value,status:'pending'});
+  succ.style.display='block';
+  ['app-name','app-email','app-dept','app-topic','app-note'].forEach(f=>document.getElementById(f).value='');
+  document.getElementById('app-role').value='';document.getElementById('app-slot').value='';
+  setTimeout(()=>succ.style.display='none',5000);
+}
+
+function checkAdmin(){
+  document.getElementById('admin-err').style.display='none';
+  if(document.getElementById('admin-pass').value===ADMIN_PASSWORD){
+    document.getElementById('admin-gate').style.display='none';
+    document.getElementById('admin-panel').style.display='block';
     renderAdmin();
-  } else {
-    document.getElementById('admin-err').style.display = 'block';
-  }
+  } else{document.getElementById('admin-err').style.display='block';}
 }
 
-function signOut() {
-  document.getElementById('admin-panel').style.display = 'none';
-  document.getElementById('admin-gate').style.display = 'block';
-  document.getElementById('admin-pass').value = '';
+function signOut(){
+  document.getElementById('admin-panel').style.display='none';
+  document.getElementById('admin-gate').style.display='block';
+  document.getElementById('admin-pass').value='';
 }
 
-function renderAdmin() {
-  const upcoming = state.slots.filter(s => s.status === 'open').length;
-  const confirmed = state.slots.filter(s => s.status === 'filled').length;
-  const past = state.slots.filter(s => s.status === 'past').length;
-  const pending = state.applications.filter(a => a.status === 'pending').length;
-  document.getElementById('admin-metrics').innerHTML = `
+function renderAdmin(){
+  const open=state.slots.filter(s=>s.status==='open').length;
+  const confirmed=state.slots.filter(s=>s.status==='filled').length;
+  const past=state.slots.filter(s=>s.status==='past').length;
+  const pending=state.applications.filter(a=>a.status==='pending').length;
+  document.getElementById('admin-metrics').innerHTML=`
     <div class="metric"><div class="metric-num">${state.slots.length}</div><div class="metric-label">Total slots</div></div>
-    <div class="metric"><div class="metric-num">${upcoming}</div><div class="metric-label">Open</div></div>
+    <div class="metric"><div class="metric-num">${open}</div><div class="metric-label">Open</div></div>
     <div class="metric"><div class="metric-num">${confirmed}</div><div class="metric-label">Confirmed</div></div>
     <div class="metric"><div class="metric-num">${past}</div><div class="metric-label">Past</div></div>
-    <div class="metric"><div class="metric-num">${pending}</div><div class="metric-label">Pending apps</div></div>
-  `;
+    <div class="metric"><div class="metric-num">${pending}</div><div class="metric-label">Pending apps</div></div>`;
   renderSlotsList();
+  renderFilterSlots();
   renderAppsList();
 }
 
-function renderSlotsList() {
-  const sorted = [...state.slots].sort((a, b) => a.date.localeCompare(b.date));
-  if (!sorted.length) { document.getElementById('slots-list').innerHTML = '<div class="empty-state">No slots added yet.</div>'; return; }
-  document.getElementById('slots-list').innerHTML = sorted.map(s => {
-    const apps = getApps(s.id);
-    const grad = apps.find(a => a.role === 'grad' && a.status === 'paired');
-    const ug = apps.find(a => a.role === 'undergrad' && a.status === 'paired');
-    const isPast = s.status === 'past';
-    return `<div class="slot-row">
-      <div style="min-width:150px">
+function renderSlotsList(){
+  const sorted=[...state.slots].sort((a,b)=>a.date.localeCompare(b.date));
+  if(!sorted.length){document.getElementById('slots-list').innerHTML='<div class="empty-state">No slots added yet.</div>';return;}
+  document.getElementById('slots-list').innerHTML=sorted.map(s=>{
+    const apps=getApps(s.id);
+    const grad=apps.find(a=>a.role==='grad'&&a.status==='paired');
+    const ug=apps.find(a=>a.role==='undergrad'&&a.status==='paired');
+    const isPast=s.status==='past';
+    return`<div class="slot-row">
+      <div class="accent-line" style="background:${s.status==='open'?'var(--blue600)':s.status==='filled'?'var(--blue400)':'var(--text3)'}"></div>
+      <div style="min-width:130px">
         <div class="slot-date">${fmt(s.date)}</div>
         <div class="slot-time">${fmtTime(s.time)}</div>
       </div>
-      <span class="badge badge-${s.status === 'open' ? 'open' : s.status === 'filled' ? 'filled' : 'past'}">${s.status}</span>
-      <div style="flex:1; min-width:160px">
+      <span class="badge badge-${s.status==='open'?'open':s.status==='filled'?'filled':'past'}">${s.status}</span>
+      <div style="flex:1;min-width:150px">
         ${!isPast
-          ? `<input type="text" placeholder="Assign school..." value="${s.school || ''}" style="font-size:12px; padding:5px 8px;" onchange="updateSchool('${s.id}', this.value)">`
-          : `<span style="font-size:13px; color:var(--text-secondary)">${s.school || '—'}</span>`}
+          ?`<div class="edit-row">
+              <input type="text" placeholder="Assign school..." value="${s.school||''}" style="font-size:11px;padding:5px 8px;" id="school-${s.id}" onchange="updateSchool('${s.id}',this.value)">
+            </div>
+            <div class="edit-row" style="margin-top:4px">
+              <input type="date" value="${s.date}" style="font-size:11px;padding:4px 7px;" id="edate-${s.id}">
+              <input type="time" value="${s.time}" style="font-size:11px;padding:4px 7px;width:90px" id="etime-${s.id}">
+              <button class="btn btn-sm" onclick="editSlot('${s.id}')">Save</button>
+            </div>`
+          :`<span style="font-size:12px;color:var(--text2)">${s.school||'—'}</span>`}
       </div>
-      <div style="min-width:180px">
+      <div style="min-width:160px">
         <div class="team-tags">
-          ${grad ? `<span class="badge badge-grad">${grad.name}</span>` : '<span style="font-size:11px;color:var(--text-muted)">No grad</span>'}
-          ${ug ? `<span class="badge badge-undergrad">${ug.name}</span>` : '<span style="font-size:11px;color:var(--text-muted)">No undergrad</span>'}
+          ${grad?`<span class="badge badge-grad">${grad.name}</span>`:'<span style="font-size:10px;color:var(--text3)">No grad</span>'}
+          ${ug?`<span class="badge badge-undergrad">${ug.name}</span>`:'<span style="font-size:10px;color:var(--text3)">No undergrad</span>'}
         </div>
       </div>
-      ${!isPast ? `<button class="btn btn-sm ml-auto" onclick="markPast('${s.id}')">Mark past</button>` : ''}
+      ${!isPast?`<button class="btn btn-sm" onclick="markPast('${s.id}')">Mark past</button>`:''}
     </div>`;
   }).join('');
 }
 
-function renderAppsList() {
-  if (!state.applications.length) {
-    document.getElementById('applications-list').innerHTML = '<div class="empty-state">No applications yet.</div>';
-    return;
-  }
-  const sorted = [...state.applications].sort((a, b) => a.status === 'pending' ? -1 : 1);
-  document.getElementById('applications-list').innerHTML = sorted.map(a => {
-    const slot = getSlot(a.slot);
-    return `<div class="app-row">
+function editSlot(slotId){
+  const s=getSlot(slotId);
+  if(!s) return;
+  const newDate=document.getElementById('edate-'+slotId).value;
+  const newTime=document.getElementById('etime-'+slotId).value;
+  if(newDate) s.date=newDate;
+  if(newTime) s.time=newTime;
+  renderAdmin();
+}
+
+function renderFilterSlots(){
+  const sel=document.getElementById('filter-slot');
+  const cur=sel.value;
+  sel.innerHTML='<option value="">All slots</option>'+[...state.slots].sort((a,b)=>a.date.localeCompare(b.date)).map(s=>`<option value="${s.id}"${s.id===cur?' selected':''}>${fmt(s.date)}</option>`).join('');
+}
+
+function renderAppsList(){
+  const filterSlot=document.getElementById('filter-slot')?.value||'';
+  let apps=[...state.applications];
+  if(filterSlot) apps=apps.filter(a=>a.slot===filterSlot);
+  apps.sort((a,b)=>a.status==='pending'?-1:1);
+
+  if(!apps.length){document.getElementById('applications-list').innerHTML='<div class="empty-state">No applications found.</div>';return;}
+
+  const openSlots=state.slots.filter(s=>s.status==='open');
+
+  document.getElementById('applications-list').innerHTML=apps.map(a=>{
+    const slot=getSlot(a.slot);
+    const slotOptions=openSlots.map(s=>`<option value="${s.id}"${a.slot===s.id?' selected':''}>${fmt(s.date)}</option>`).join('');
+    return`<div class="app-row">
       <div class="ainfo">
         <div class="aname">${a.name}</div>
-        <div class="ameta">${a.email} &bull; ${a.dept || 'No dept given'}</div>
-        <div class="ameta">Slot: ${slot ? fmt(slot.date) + ' ' + fmtTime(slot.time) : 'Unknown'}</div>
-        ${a.topic ? `<div class="ameta">Topic: ${a.topic}</div>` : ''}
-        ${a.note ? `<div class="ameta">Note: ${a.note}</div>` : ''}
+        <div class="ameta">${a.email} &bull; ${a.dept||'No dept given'}</div>
+        <div class="ameta">Slot: ${slot?fmt(slot.date)+' '+fmtTime(slot.time):'Unknown'}</div>
+        ${a.topic?`<div class="ameta">Topic: ${a.topic}</div>`:''}
+        ${a.note?`<div class="ameta">Note: ${a.note}</div>`:''}
+        ${a.status==='pending'?`<div style="margin-top:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em">Assign to slot:</span>
+          <select style="width:auto;font-size:11px;padding:4px 7px" onchange="reassignSlot('${a.id}',this.value)">
+            ${slotOptions}
+          </select>
+        </div>`:''}
       </div>
-      <div style="display:flex; flex-direction:column; gap:5px; align-items:flex-end">
-        <span class="badge badge-${a.role === 'grad' ? 'grad' : 'undergrad'}">${a.role === 'grad' ? 'Graduate' : 'Undergrad'}</span>
-        <span class="badge badge-${a.status === 'pending' ? 'pending' : 'filled'}">${a.status}</span>
+      <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end">
+        <span class="badge badge-${a.role==='grad'?'grad':'undergrad'}">${a.role==='grad'?'Graduate':'Undergrad'}</span>
+        <span class="badge badge-${a.status==='pending'?'pending':'filled'}">${a.status}</span>
       </div>
-      ${a.status === 'pending' ? `<button class="btn btn-sm btn-primary ml-auto" onclick="pairApplicant('${a.id}')">Confirm &amp; pair</button>` : ''}
+      ${a.status==='pending'?`<button class="btn btn-sm btn-primary ml-auto" onclick="pairApplicant('${a.id}')">Confirm &amp; pair</button>`:''}
     </div>`;
   }).join('');
 }
 
-function updateSchool(slotId, val) {
-  const s = getSlot(slotId);
-  if (s) { s.school = val; renderPublic(); }
+function reassignSlot(appId,newSlotId){
+  const a=state.applications.find(x=>x.id===appId);
+  if(a&&newSlotId) a.slot=newSlotId;
 }
 
-function markPast(slotId) {
-  const s = getSlot(slotId);
-  if (s) { s.status = 'past'; renderAdmin(); }
+function updateSchool(slotId,val){
+  const s=getSlot(slotId);
+  if(s){s.school=val;renderPublic();}
 }
 
-function pairApplicant(appId) {
-  const a = state.applications.find(x => x.id === appId);
-  if (!a) return;
-  a.status = 'paired';
-  const slot = getSlot(a.slot);
-  if (slot) {
-    slot.team.push(appId);
-    const apps = getApps(slot.id);
-    const hasGrad = apps.some(x => x.role === 'grad' && x.status === 'paired');
-    const hasUG = apps.some(x => x.role === 'undergrad' && x.status === 'paired');
-    if (hasGrad && hasUG) slot.status = 'filled';
+function markPast(slotId){
+  const s=getSlot(slotId);
+  if(s){s.status='past';renderAdmin();}
+}
+
+function pairApplicant(appId){
+  const a=state.applications.find(x=>x.id===appId);
+  if(!a) return;
+  a.status='paired';
+  const slot=getSlot(a.slot);
+  if(slot){
+    if(!slot.team.includes(appId)) slot.team.push(appId);
+    const apps=getApps(slot.id);
+    const hasGrad=apps.some(x=>x.role==='grad'&&x.status==='paired');
+    const hasUG=apps.some(x=>x.role==='undergrad'&&x.status==='paired');
+    if(hasGrad&&hasUG) slot.status='filled';
   }
   renderAdmin();
 }
 
-function addSlot() {
-  const date = document.getElementById('slot-date').value;
-  const time = document.getElementById('slot-time').value || '09:00';
-  if (!date) { alert('Please select a date.'); return; }
-  state.slots.push({ id: 's' + Date.now(), date, time, status: 'open', school: '', team: [] });
-  document.getElementById('slot-date').value = '';
-  const succ = document.getElementById('slot-add-success');
-  succ.style.display = 'block';
-  setTimeout(() => succ.style.display = 'none', 3000);
+function addSlot(){
+  const date=document.getElementById('slot-date').value;
+  const time=document.getElementById('slot-time').value||'09:00';
+  if(!date){alert('Please select a date.');return;}
+  state.slots.push({id:'s'+Date.now(),date,time,status:'open',school:'',team:[]});
+  document.getElementById('slot-date').value='';
+  const succ=document.getElementById('slot-add-success');
+  succ.style.display='block';
+  setTimeout(()=>succ.style.display='none',3000);
   renderAdmin();
 }
 
